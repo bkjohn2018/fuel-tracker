@@ -262,10 +262,10 @@ def run_backtest_pipeline(
                 logger.info(
                     "Parsed asof_ts", extra={"asof_ts": parsed_asof_ts.isoformat()}
                 )
-                            except ValueError:
-                    raise ValueError(
-                        f"Invalid asof_ts format: {asof_ts}. Expected ISO format."
-                    ) from None
+            except ValueError:
+                raise ValueError(
+                    f"Invalid asof_ts format: {asof_ts}. Expected ISO format."
+                ) from None
 
         # Get panel path
         panel_path = OUTPUTS_DIR / "panel_monthly.parquet"
