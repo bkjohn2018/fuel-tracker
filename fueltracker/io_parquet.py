@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 def read_panel(path: Path) -> pd.DataFrame:
     """
-    Read panel from parquet file if it exists, otherwise return empty DataFrame 
+    Read panel from parquet file if it exists, otherwise return empty DataFrame
     with correct dtypes.
 
     Args:

@@ -279,7 +279,7 @@ def _create_default_model_card() -> str:
 - **Batch ID**: [Auto-updated]
 
 ## Objective
-Forecast monthly pipeline compressor fuel consumption in million cubic feet (MMcf) 
+Forecast monthly pipeline compressor fuel consumption in million cubic feet (MMcf)
 to support operational planning and resource allocation.
 
 ## Target Variable
