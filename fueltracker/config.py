@@ -4,9 +4,10 @@ Loads environment variables and sets up project directories.
 """
 
 import os
-import yaml
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+import yaml
 
 # Load environment variables
 EIA_API_KEY: Optional[str] = os.getenv("EIA_API_KEY")
@@ -34,20 +35,20 @@ EIA_ENDPOINTS_FILE = Path("config/eia_endpoints.yml")
 def get_eia_endpoint_config(endpoint_key: str) -> Optional[Dict[str, Any]]:
     """
     Get EIA endpoint configuration from YAML file.
-    
+
     Args:
         endpoint_key: Key for the endpoint configuration
-        
+
     Returns:
         Endpoint configuration dictionary or None if not found
     """
     if not EIA_ENDPOINTS_FILE.exists():
         return None
-    
+
     try:
         with open(EIA_ENDPOINTS_FILE, 'r', encoding='utf-8') as f:
             endpoints_config = yaml.safe_load(f)
-        
+
         return endpoints_config.get(endpoint_key)
     except Exception as e:
         print(f"Warning: Failed to load EIA endpoints config: {e}")
