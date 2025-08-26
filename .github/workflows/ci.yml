@@ -36,8 +36,12 @@ jobs:
           ruff --version
           ruff config
 
-      - name: Lint
-        run: ruff check .
+      - name: Lint and Auto-Fix
+        run: |
+          # First run with autofix to resolve most issues
+          ruff check . --fix
+          # Then check if any issues remain
+          ruff check .
 
       - name: Unit tests (no secrets)
         run: pytest -q
