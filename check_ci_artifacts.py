@@ -3,8 +3,9 @@
 Run this after downloading artifacts from GitHub Actions"""
 
 import sys
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 def test_panel(artifacts_path="artifacts"):
     """Test panel data integrity"""
