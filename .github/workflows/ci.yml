@@ -42,6 +42,22 @@ jobs:
           ruff check . --fix
           # Then check if any issues remain
           ruff check .
+          
+      - name: Commit Auto-Fixed Files
+        if: always()
+        run: |
+          # Configure git for the commit
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check if there are any changes to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "style: auto-fix ruff issues (imports, formatting, unused vars)"
+            git push
+          else
+            echo "No files were auto-fixed"
+          fi
 
       - name: Unit tests (no secrets)
         run: pytest -q
