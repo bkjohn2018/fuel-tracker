@@ -59,7 +59,8 @@ class SARIMAX:
         """
         if len(y) < self.seasonal_order[3] * 2:
             raise ValueError(
-                f"Training data must have at least {self.seasonal_order[3] * 2} observations"
+                f"Training data must have at least "
+                f"{self.seasonal_order[3] * 2} observations"
             )
 
         # Simple SARIMAX-like implementation

@@ -13,7 +13,8 @@ logger = get_logger(__name__)
 
 
 class STLETS:
-    """STL-ETS forecasting model combining seasonal decomposition with exponential smoothing."""
+    """STL-ETS forecasting model combining seasonal decomposition with 
+    exponential smoothing."""
 
     def __init__(
         self, period: int = 12, seasonal_window: int = 7, trend_window: int = 21

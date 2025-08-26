@@ -166,7 +166,8 @@ def main():
 
         if results.get("date_range"):
             print(
-                f"   Date range: {results['date_range']['start']} to {results['date_range']['end']}"
+                f"   Date range: {results['date_range']['start']} to "
+                f"{results['date_range']['end']}"
             )
 
         if args.dry_run:

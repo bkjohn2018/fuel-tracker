@@ -51,7 +51,9 @@ def select_winning_model(metrics_path: Path) -> str:
         #     'mae': 'mean',
         #     'smape': 'mean'
         # }).reset_index()
-        # winning_model = model_performance.loc[model_performance['mae'].idxmin(), 'model']
+        # winning_model = model_performance.loc[
+        #     model_performance['mae'].idxmin(), 'model'
+        # ]
         # return winning_model
 
     except Exception as e:
@@ -221,7 +223,9 @@ def write_forecast_csv(
         extra={
             "path": str(forecast_path),
             "rows": len(forecast_df),
-            "date_range": f"{forecast_df['period'].min()} to {forecast_df['period'].max()}",
+            "date_range": (
+                f"{forecast_df['period'].min()} to {forecast_df['period'].max()}"
+            ),
         },
     )
 
@@ -275,7 +279,8 @@ def _create_default_model_card() -> str:
 - **Batch ID**: [Auto-updated]
 
 ## Objective
-Forecast monthly pipeline compressor fuel consumption in million cubic feet (MMcf) to support operational planning and resource allocation.
+Forecast monthly pipeline compressor fuel consumption in million cubic feet (MMcf) 
+to support operational planning and resource allocation.
 
 ## Target Variable
 - **Variable**: `value_mmcf`

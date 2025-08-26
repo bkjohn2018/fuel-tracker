@@ -62,7 +62,9 @@ def build_monthly_panel(raw_df: pd.DataFrame, batch: BatchMeta) -> pd.DataFrame:
             extra={
                 "final_rows": len(panel_df),
                 "final_columns": list(panel_df.columns),
-                "date_range": f"{panel_df['period'].min()} to {panel_df['period'].max()}",
+                "date_range": (
+                    f"{panel_df['period'].min()} to {panel_df['period'].max()}"
+                ),
             },
         )
 
@@ -190,7 +192,8 @@ def _validate_panel(df: pd.DataFrame) -> pd.DataFrame:
     for idx in sample_indices:
         row = df.loc[idx]
         try:
-            # Create a mock BatchMeta for validation (we'll use the real one from lineage)
+            # Create a mock BatchMeta for validation 
+            # (we'll use the real one from lineage)
             mock_batch = BatchMeta(
                 batch_id=row['batch_id'], asof_ts=row['asof_ts'], source="EIA"
             )

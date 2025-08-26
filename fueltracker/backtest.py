@@ -81,9 +81,11 @@ def get_frozen_subpanel(
             "total_rows": len(panel_df),
             "frozen_rows": len(frozen_panel),
             "asof_ts": asof_ts.isoformat(),
-            "date_range": f"{frozen_panel['period'].min()} to {frozen_panel['period'].max()}"
-            if not frozen_panel.empty
-            else "empty",
+                        "date_range": (
+                f"{frozen_panel['period'].min()} to {frozen_panel['period'].max()}"
+                if not frozen_panel.empty
+                else "empty"
+            ),
         },
     )
 

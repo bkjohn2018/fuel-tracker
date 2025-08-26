@@ -93,7 +93,9 @@ class PanelFrameMeta(BaseModel):
             # Parse the vintage label to ensure it's a valid datetime
             pd.to_datetime(v)
         except ValueError:
-            raise ValueError("vintage_label must be in format YYYY-MM-DDTHH:MMZ") from None
+            raise ValueError(
+                "vintage_label must be in format YYYY-MM-DDTHH:MMZ"
+            ) from None
         return v
 
     @field_validator('n_rows')
