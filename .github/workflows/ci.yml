@@ -31,6 +31,11 @@ jobs:
           # Install package in editable mode for imports to work
           pip install -e .
 
+      - name: Show Ruff env (version & config)
+        run: |
+          ruff --version
+          ruff config
+
       - name: Lint
         run: ruff check .
 
