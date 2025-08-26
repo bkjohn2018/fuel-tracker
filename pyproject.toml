@@ -65,16 +65,25 @@ filterwarnings = [
 line-length = 88
 target-version = "py311"
 
+[tool.ruff.lint]
+# Enable: pycodestyle (E), pyflakes (F), bugbear (B), isort (I)
+select = ["E", "F", "B", "I"]
+# Put any ignores here (migrated from deprecated top-level):
+# ignore = ["W293"]
+
+# Optional: make fixes allowed when you pass --fix
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+# Tell isort what's "yours" so imports group correctly
+known-first-party = ["fueltracker"]
+combine-as-imports = true
+force-sort-within-sections = true
+
 [tool.ruff.format]
+# Keep defaults similar to Black, LF endings
 quote-style = "preserve"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "lf"
-
-[tool.ruff.lint]
-select = ["E", "F", "B", "I"]  # pycodestyle/pyflakes/bugbear/isort
-
-[tool.ruff.lint.isort]
-known-first-party = ["fueltracker"]
-combine-as-imports = true
-force-sort-within-sections = true
