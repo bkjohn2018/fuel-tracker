@@ -1,0 +1,26 @@
+# EIA v2 API endpoint configurations
+# These endpoints will be filled with exact paths later
+
+pipeline_fuel_monthly:
+  endpoint: "https://api.eia.gov/v2/XXX/YYY"  # placeholder; parametrize
+  params:
+    frequency: "monthly"
+    data: ["value"]  # align to EIA v2 response shape
+    # Additional parameters can be added here as needed
+    # start: null  # optional start date
+    # end: null    # optional end date
+    # offset: 0    # pagination offset
+    # length: 5000 # pagination length
+
+# Future endpoints can be added here
+# pipeline_fuel_daily:
+#   endpoint: "https://api.eia.gov/v2/XXX/YYY"
+#   params:
+#     frequency: "daily"
+#     data: ["value"]
+
+# compressor_fuel_weekly:
+#   endpoint: "https://api.eia.gov/v2/XXX/YYY"
+#   params:
+#     frequency: "weekly"
+#     data: ["value"]

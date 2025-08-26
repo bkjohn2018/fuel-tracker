@@ -1,0 +1,13 @@
+pandas>=2.2
+numpy>=1.26
+requests>=2.32
+tenacity>=8.3
+pydantic>=2.7
+pyarrow>=16.0
+statsmodels>=0.14
+holidays>=0.56
+PyYAML>=6.0
+
+# Development and testing
+ruff>=0.6.9
+pytest>=7.0.0

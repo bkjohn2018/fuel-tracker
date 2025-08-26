@@ -1,0 +1,76 @@
+name: ci
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+          pip install ruff pytest
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Unit tests (no secrets)
+        run: pytest -q
+
+  pipeline:
+    # Only run the data pull/forecast on pushes to main (not PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-and-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+
+      - name: Mask EIA secret
+        run: echo "::add-mask::${{ secrets.EIA_API_KEY }}"
+
+      # Secret is scoped ONLY to the steps that need it
+      - name: Pull data → build panel
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: make pull
+
+      - name: Backtest baseline
+        run: make backtest
+
+      - name: Forecast 12m
+        run: make forecast
+
+      - name: Upload artifacts (non-sensitive)
+        uses: actions/upload-artifact@v4
+        with:
+          name: fueltracker-outputs
+          path: |
+            outputs/panel_monthly.parquet
+            outputs/metrics.csv
+            outputs/forecast_12m.csv
+          retention-days: 7
