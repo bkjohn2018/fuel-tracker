@@ -55,7 +55,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = ["-v", "--tb=short"]
+addopts = "-q"
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
@@ -64,6 +64,7 @@ filterwarnings = [
 [tool.ruff]
 target-version = "py311"
 line-length = 88
+fix = true
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
