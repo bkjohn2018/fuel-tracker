@@ -35,10 +35,10 @@ Forecast monthly pipeline compressor fuel consumption in million cubic feet (MMc
 ## Forecast Details
 ## Latest Forecast Statistics
 - **Model Used**: baseline
-- **Forecast Horizon**: 6 months
-- **Forecast Mean**: 92.40 MMcf
+- **Forecast Horizon**: 12 months
+- **Forecast Mean**: 77.04 MMcf
 - **PI Half-Width**: 9.32 MMcf
-- **Generated**: 2025-08-26 16:42:55 UTC
+- **Generated**: 2025-08-26 18:18:44 UTC
 
 ## Tolerance & Performance
 - **Target MAE**: [To be defined]
