@@ -4,6 +4,8 @@ Smoke tests for EIA client with mocked HTTP requests.
 
 import pytest
 import pandas as pd
+import requests
+from tenacity import RetryError
 from unittest.mock import Mock, patch
 from fueltracker.eia_client import EIAClient
 
@@ -65,7 +67,7 @@ class TestEIAClientSmoke:
         mock_get.return_value = mock_response
         
         # This should raise an exception after retries
-        with pytest.raises(Exception):
+        with pytest.raises(RetryError):
             self.client.fetch_series("petroleum/pri/spt/data", {})
         
         # Verify retry attempts (should be 5 based on tenacity config)
@@ -80,7 +82,7 @@ class TestEIAClientSmoke:
         mock_get.return_value = mock_response
         
         # This should raise an exception after retries
-        with pytest.raises(Exception):
+        with pytest.raises(RetryError):
             self.client.fetch_series("petroleum/pri/spt/data", {})
         
         # Verify retry attempts
@@ -109,7 +111,9 @@ class TestEIAClientSmoke:
         
         # Verify sorting by period
         periods = result['period'].dt.to_period('M')
-        assert (periods.diff().dropna() >= 0).all()  # Monotonically increasing
+        # Convert to timestamp for comparison
+        period_timestamps = periods.astype(str).astype('datetime64[ns]')
+        assert (period_timestamps.diff().dropna() >= pd.Timedelta(0)).all()  # Monotonically increasing
     
     @patch('requests.get')
     def test_empty_response_handling(self, mock_get):
