@@ -1,5 +1,5 @@
-"""
-Logging utilities for Fuel Tracker.
+"""Logging utilities for Fuel Tracker.
+
 Provides structured logging with JSON-like formatting.
 """
 
@@ -39,7 +39,6 @@ def get_logger(name: str, level: Optional[int] = None) -> logging.Logger:
     Args:
         name: Logger name (usually __name__)
         level: Optional logging level override
-
     Returns:
         Configured logger instance
     """
@@ -50,7 +49,6 @@ def get_logger(name: str, level: Optional[int] = None) -> logging.Logger:
         # Set default level
         if level is None:
             level = logging.INFO
-
         logger.setLevel(level)
 
         # Create console handler
@@ -66,5 +64,4 @@ def get_logger(name: str, level: Optional[int] = None) -> logging.Logger:
 
         # Prevent propagation to root logger to avoid duplicate messages
         logger.propagate = False
-
     return logger

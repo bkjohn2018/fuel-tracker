@@ -1,6 +1,4 @@
-"""
-I/O operations for Fuel Tracker using PyArrow and Parquet.
-"""
+"""I/O operations for Fuel Tracker using PyArrow and Parquet."""
 
 import json
 from pathlib import Path
@@ -49,7 +47,6 @@ def read_panel(path: Path) -> pd.DataFrame:
         )
 
         return df
-
     except Exception as e:
         logger.error("Failed to read panel", extra={"path": str(path), "error": str(e)})
         logger.info("Returning empty DataFrame due to read error")
@@ -73,7 +70,6 @@ def _create_empty_panel() -> pd.DataFrame:
             'asof_ts': pd.Series(dtype='object'),  # datetime
         }
     )
-
     return empty_df
 
 
@@ -120,13 +116,11 @@ def append_revision(df: pd.DataFrame, path: Path) -> None:
 
         # Write combined data
         _write_panel(combined_df, path)
-
     else:
         # Create new file
         logger.info(
             "Creating new panel file", extra={"path": str(path), "rows": len(df)}
         )
-
         _write_panel(df, path)
 
 
@@ -158,7 +152,6 @@ def _write_panel(df: pd.DataFrame, path: Path) -> None:
             "Panel written successfully",
             extra={"path": str(path), "rows": len(df), "columns": list(df.columns)},
         )
-
     except Exception as e:
         logger.error(
             "Failed to write panel", extra={"path": str(path), "error": str(e)}
@@ -198,7 +191,6 @@ def write_lineage_log(
             f.write(json.dumps(log_entry) + '\n')
 
         logger.info("Lineage log entry written", extra=log_entry)
-
     except Exception as e:
         logger.error(
             "Failed to write lineage log",
@@ -252,6 +244,5 @@ def get_panel_info(path: Path) -> Dict[str, Any]:
             )
 
         return info
-
     except Exception as e:
         return {"exists": True, "error": f"Failed to read file: {str(e)}"}

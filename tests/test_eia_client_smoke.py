@@ -1,11 +1,10 @@
-"""
-Smoke tests for EIA client with mocked HTTP requests.
-"""
+"""Smoke tests for EIA client with mocked HTTP requests."""
 
 from unittest.mock import Mock, patch
 
 import pandas as pd
 import pytest
+import requests
 from tenacity import RetryError
 
 from fueltracker.eia_client import EIAClient
@@ -16,9 +15,8 @@ class TestEIAClientSmoke:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.api_key = "test_api_key_12345"
+        self.api_key = "test_api_key_12345"  # pragma: allowlist secret
         self.client = EIAClient(self.api_key)
-
         # Sample EIA API response
         self.sample_response = {
             "response": {
@@ -79,6 +77,7 @@ class TestEIAClientSmoke:
         # Mock rate limit response
         mock_response = Mock()
         mock_response.status_code = 429
+        mock_response.raise_for_status.side_effect = requests.HTTPError("429")
         mock_get.return_value = mock_response
 
         # This should raise an exception after retries
@@ -94,6 +93,7 @@ class TestEIAClientSmoke:
         # Mock server error response
         mock_response = Mock()
         mock_response.status_code = 500
+        mock_response.raise_for_status.side_effect = requests.HTTPError("500")
         mock_get.return_value = mock_response
 
         # This should raise an exception after retries
@@ -131,6 +131,7 @@ class TestEIAClientSmoke:
         assert (
             period_timestamps.diff().dropna() >= pd.Timedelta(0)
         ).all()  # Monotonically increasing
+        assert (periods.diff().dropna() >= 0).all()  # Monotonically increasing
 
     @patch('requests.get')
     def test_empty_response_handling(self, mock_get):

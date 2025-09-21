@@ -1,6 +1,4 @@
-"""
-Data contracts and schemas for Fuel Tracker using Pydantic v2.
-"""
+"""Data contracts and schemas for Fuel Tracker using Pydantic v2."""
 
 from datetime import date, datetime
 from typing import Literal, Optional
