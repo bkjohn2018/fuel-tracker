@@ -1,0 +1,19 @@
+# Global owners
+* @bkjohn2018
+
+# Documentation owners
+/README.md @bkjohn2018
+/MODEL_CARD.md @bkjohn2018
+/docs/ @bkjohn2018
+*.md @bkjohn2018
+
+# Configuration files
+/.github/ @bkjohn2018
+/pyproject.toml @bkjohn2018
+/requirements.txt @bkjohn2018
+/Makefile @bkjohn2018
+
+# Core compliance modules
+/fueltracker/lineage.py @bkjohn2018
+/fueltracker/contracts.py @bkjohn2018
+/fueltracker/provisional.py @bkjohn2018

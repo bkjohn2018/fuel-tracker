@@ -2,9 +2,10 @@
 
 **A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Ruff](https://img.shields.io/badge/ruff-linted-green.svg)](https://github.com/astral-sh/ruff)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Build](https://github.com/bkjohn2018/fuel-tracker/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![Lint](https://img.shields.io/badge/Ruff-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 ## Why It Matters
 
@@ -155,6 +156,31 @@ python -m fueltracker.forecast --model baseline --horizon 12
 - **Annual**: Full compliance audit and system review
 - **CPA Review**: External audit documentation and certification
 - **ASC 980 Assessment**: Probable recovery evaluation for regulatory assets
+
+### Quick-Reference Journal Entries (illustrative)
+- **Record compressor fuel expense (Acct 820)**
+  - Dr 820 Pipeline compressor fuel expense
+  - Cr 131/Inventory or 232/AP (as applicable)
+
+- **Record fuel retainage revenue (Acct 489)**
+  - Dr 142/AR (or clearing)
+  - Cr 489 Transportation revenue – fuel retainage
+
+- **Under-recovery (regulatory asset, Acct 182.3)**
+  - Dr 182.3 Regulatory asset – fuel under-recovery
+  - Cr 489 Transportation revenue – fuel retainage (or 254 reversal on settlement)
+
+- **Over-recovery (regulatory liability, Acct 254)**
+  - Dr 489 Transportation revenue – fuel retainage (or 182.3 reversal on settlement)
+  - Cr 254 Regulatory liability – fuel over-recovery
+
+> **Variance & Escalation**
+> - If |Actual − Source| / Source > **2%** at monthly tie-out:
+>   1) Re-pull snapshot & rerun panel for same `asof_ts`
+>   2) If variance persists → open "Fuel Variance" ticket with artifacts:
+>      - Source snapshot metadata, `batch_id`, `asof_ts`
+>      - Diff excerpt (by month) and top drivers
+>   3) Mark run **provisional** and **do not publish** until resolved
 
 ### Revision Management
 - **Append-Only**: New revisions as PPAs; never overwrites
