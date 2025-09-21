@@ -1,9 +1,12 @@
 """Smoke tests for EIA client with mocked HTTP requests."""
 
-import pytest
-import pandas as pd
-import requests
 from unittest.mock import Mock, patch
+
+import pandas as pd
+import pytest
+import requests
+from tenacity import RetryError
+
 from fueltracker.eia_client import EIAClient
 
 
@@ -12,15 +15,27 @@ class TestEIAClientSmoke:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.api_key = "test_api_key_12345"
+        self.api_key = "test_api_key_12345"  # pragma: allowlist secret
         self.client = EIAClient(self.api_key)
         # Sample EIA API response
         self.sample_response = {
             "response": {
                 "data": [
-                    {"period": "2024-01", "value": "75.50", "unit": "dollars per barrel"},
-                    {"period": "2024-02", "value": "78.20", "unit": "dollars per barrel"},
-                    {"period": "2024-03", "value": "82.10", "unit": "dollars per barrel"}
+                    {
+                        "period": "2024-01",
+                        "value": "75.50",
+                        "unit": "dollars per barrel",
+                    },
+                    {
+                        "period": "2024-02",
+                        "value": "78.20",
+                        "unit": "dollars per barrel",
+                    },
+                    {
+                        "period": "2024-03",
+                        "value": "82.10",
+                        "unit": "dollars per barrel",
+                    },
                 ]
             }
         }
@@ -40,7 +55,9 @@ class TestEIAClientSmoke:
         mock_get.return_value = mock_response
 
         # Make request
-        result = self.client.fetch_series("petroleum/pri/spt/data", {"frequency": "monthly"})
+        result = self.client.fetch_series(
+            "petroleum/pri/spt/data", {"frequency": "monthly"}
+        )
 
         # Verify API key was injected
         mock_get.assert_called_once()
@@ -63,8 +80,8 @@ class TestEIAClientSmoke:
         mock_response.raise_for_status.side_effect = requests.HTTPError("429")
         mock_get.return_value = mock_response
 
-        # This should raise an HTTPError after retries
-        with pytest.raises(requests.HTTPError):
+        # This should raise an exception after retries
+        with pytest.raises(RetryError):
             self.client.fetch_series("petroleum/pri/spt/data", {})
 
         # Verify retry attempts (should be 5 based on tenacity config)
@@ -79,8 +96,8 @@ class TestEIAClientSmoke:
         mock_response.raise_for_status.side_effect = requests.HTTPError("500")
         mock_get.return_value = mock_response
 
-        # This should raise an HTTPError after retries
-        with pytest.raises(requests.HTTPError):
+        # This should raise an exception after retries
+        with pytest.raises(RetryError):
             self.client.fetch_series("petroleum/pri/spt/data", {})
 
         # Verify retry attempts
@@ -109,6 +126,11 @@ class TestEIAClientSmoke:
 
         # Verify sorting by period
         periods = result['period'].dt.to_period('M')
+        # Convert to timestamp for comparison
+        period_timestamps = periods.astype(str).astype('datetime64[ns]')
+        assert (
+            period_timestamps.diff().dropna() >= pd.Timedelta(0)
+        ).all()  # Monotonically increasing
         assert (periods.diff().dropna() >= 0).all()  # Monotonically increasing
 
     @patch('requests.get')

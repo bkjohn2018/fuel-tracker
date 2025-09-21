@@ -1,7 +1,7 @@
 name: ci
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "**" ]  # Run on all branches including repair/**
   pull_request:
   workflow_dispatch:
 
@@ -25,11 +25,39 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install -U pip
-          pip install -r requirements.txt
           pip install ruff pytest
+          # Install app + test dependencies
+          pip install -r requirements.txt
+          # Install package in editable mode for imports to work
+          pip install -e .
 
-      - name: Lint
-        run: ruff check .
+      - name: Show Ruff env (version & config)
+        run: |
+          ruff --version
+          ruff config
+
+      - name: Lint and Auto-Fix
+        run: |
+          # First run with autofix to resolve most issues
+          ruff check . --fix
+          # Then check if any issues remain
+          ruff check .
+
+      - name: Commit Auto-Fixed Files
+        if: always()
+        run: |
+          # Configure git for the commit
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Check if there are any changes to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "style: auto-fix ruff issues (imports, formatting, unused vars)"
+            git push
+          else
+            echo "No files were auto-fixed"
+          fi
 
       - name: Unit tests (no secrets)
         run: pytest -q

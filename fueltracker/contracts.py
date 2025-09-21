@@ -3,18 +3,23 @@
 from datetime import date, datetime
 from typing import Literal, Optional
 from uuid import UUID
-from pydantic import BaseModel, Field, field_validator
+
 import pandas as pd
+from pydantic import BaseModel, Field, field_validator
 
 
 class BatchMeta(BaseModel):
     """Metadata for a data processing batch."""
-    
+
     batch_id: UUID = Field(description="Unique identifier for the batch")
     asof_ts: datetime = Field(description="Timestamp when the batch was created")
-    source: Literal["EIA", "BACKTEST", "FORECAST"] = Field(description="Data source identifier")
-    notes: Optional[str] = Field(default=None, description="Optional notes about the batch")
-    
+    source: Literal["EIA", "BACKTEST", "FORECAST"] = Field(
+        description="Data source identifier"
+    )
+    notes: Optional[str] = Field(
+        default=None, description="Optional notes about the batch"
+    )
+
     @field_validator('asof_ts')
     @classmethod
     def validate_asof_ts(cls, v):
@@ -22,25 +27,28 @@ class BatchMeta(BaseModel):
         if v.tzinfo is None:
             raise ValueError("asof_ts must be timezone-aware")
         return v
-    
+
     class Config:
         """Pydantic configuration."""
+
         json_encoders = {
             UUID: str,
             datetime: lambda v: v.isoformat(),
-            date: lambda v: v.isoformat()
+            date: lambda v: v.isoformat(),
         }
 
 
 class MonthlyFuelRow(BaseModel):
     """Schema for monthly fuel consumption data rows."""
-    
+
     period: date = Field(description="Month-end date for the data point")
     value_mmcf: float = Field(description="Value in million cubic feet")
-    metric: Literal["pipeline_compressor_fuel"] = Field(description="Type of fuel metric")
+    metric: Literal["pipeline_compressor_fuel"] = Field(
+        description="Type of fuel metric"
+    )
     freq: Literal["monthly"] = Field(description="Data frequency")
     lineage: BatchMeta = Field(description="Lineage information for the row")
-    
+
     @field_validator('period')
     @classmethod
     def validate_period(cls, v):
@@ -48,7 +56,7 @@ class MonthlyFuelRow(BaseModel):
         if v.day != pd.Timestamp(v).days_in_month:
             raise ValueError("period must be month-end date")
         return v
-    
+
     @field_validator('value_mmcf')
     @classmethod
     def validate_value_mmcf(cls, v):
@@ -56,24 +64,25 @@ class MonthlyFuelRow(BaseModel):
         if v < 0:
             raise ValueError("value_mmcf must be non-negative")
         return v
-    
+
     class Config:
         """Pydantic configuration."""
+
         json_encoders = {
             UUID: str,
             datetime: lambda v: v.isoformat(),
-            date: lambda v: v.isoformat()
+            date: lambda v: v.isoformat(),
         }
 
 
 class PanelFrameMeta(BaseModel):
     """Metadata for a panel data frame."""
-    
+
     vintage_label: str = Field(description="Vintage label in format YYYY-MM-DDTHH:MMZ")
     n_rows: int = Field(description="Number of rows in the panel")
     start: date = Field(description="Start date of the panel data")
     end: date = Field(description="End date of the panel data")
-    
+
     @field_validator('vintage_label')
     @classmethod
     def validate_vintage_label(cls, v):
@@ -82,9 +91,11 @@ class PanelFrameMeta(BaseModel):
             # Parse the vintage label to ensure it's a valid datetime
             pd.to_datetime(v)
         except ValueError:
-            raise ValueError("vintage_label must be in format YYYY-MM-DDTHH:MMZ")
+            raise ValueError(
+                "vintage_label must be in format YYYY-MM-DDTHH:MMZ"
+            ) from None
         return v
-    
+
     @field_validator('n_rows')
     @classmethod
     def validate_n_rows(cls, v):
@@ -92,7 +103,7 @@ class PanelFrameMeta(BaseModel):
         if v < 0:
             raise ValueError("n_rows must be non-negative")
         return v
-    
+
     @field_validator('end')
     @classmethod
     def validate_end_after_start(cls, v, info):
@@ -100,13 +111,14 @@ class PanelFrameMeta(BaseModel):
         if 'start' in info.data and v <= info.data['start']:
             raise ValueError("end date must be after start date")
         return v
-    
+
     class Config:
         """Pydantic configuration."""
+
         json_encoders = {
             UUID: str,
             datetime: lambda v: v.isoformat(),
-            date: lambda v: v.isoformat()
+            date: lambda v: v.isoformat(),
         }
 
 

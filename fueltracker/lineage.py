@@ -1,1 +1,194 @@
-"""Lineage management for Fuel Tracker data processing."""import pandas as pdfrom datetime import datetime, timezonefrom typing import Dict, Any, Optionalfrom uuid import uuid4from .contracts import BatchMeta, BatchIdfrom .logging_utils import get_loggerlogger = get_logger(__name__)def start_batch(source: str = "EIA", notes: Optional[str] = None) -> BatchMeta:    """    Start a new data processing batch.    Args:        source: Data source identifier (defaults to "EIA")        notes: Optional notes about the batch    Returns:        BatchMeta with new UUID and current UTC timestamp    """    batch_id = uuid4()    asof_ts = datetime.now(timezone.utc)    batch_meta = BatchMeta(        batch_id=batch_id,        asof_ts=asof_ts,        source=source,        notes=notes    )    logger.info("Started new batch", extra={        "batch_id": str(batch_id),        "source": source,        "asof_ts": asof_ts.isoformat()    })    return batch_metadef attach_lineage_columns(    df: pd.DataFrame,    batch_meta: BatchMeta,    batch_id_col: str = "batch_id",    asof_ts_col: str = "asof_ts") -> pd.DataFrame:    """    Attach lineage columns to a DataFrame.    Args:        df: Input DataFrame        batch_meta: Batch metadata containing lineage information        batch_id_col: Name for the batch ID column        asof_ts_col: Name for the asof timestamp column    Returns:        DataFrame with lineage columns added    """    if df.empty:        logger.warning("DataFrame is empty, no lineage columns to add")        return df    # Create a copy to avoid modifying the original    df_with_lineage = df.copy()    # Add lineage columns    df_with_lineage[batch_id_col] = batch_meta.batch_id    df_with_lineage[asof_ts_col] = batch_meta.asof_ts    logger.info("Attached lineage columns to DataFrame", extra={        "batch_id": str(batch_meta.batch_id),        "rows": len(df_with_lineage),        "batch_id_col": batch_id_col,        "asof_ts_col": asof_ts_col    })    return df_with_lineagedef create_lineage_dict(batch_meta: BatchMeta) -> Dict[str, Any]:    """    Create a dictionary representation of lineage information.    Args:        batch_meta: Batch metadata    Returns:        Dictionary with lineage information    """    return {        "batch_id": str(batch_meta.batch_id),        "asof_ts": batch_meta.asof_ts.isoformat(),        "source": batch_meta.source,        "notes": batch_meta.notes    }def validate_lineage_columns(    df: pd.DataFrame,    batch_id_col: str = "batch_id",    asof_ts_col: str = "asof_ts") -> bool:    """    Validate that a DataFrame has the required lineage columns.    Args:        df: DataFrame to validate        batch_id_col: Expected batch ID column name        asof_ts_col: Expected asof timestamp column name    Returns:        True if all required columns are present and valid    """    required_cols = [batch_id_col, asof_ts_col]    # Check if required columns exist    missing_cols = [col for col in required_cols if col not in df.columns]    if missing_cols:        logger.error("Missing required lineage columns", extra={"missing_cols": missing_cols})        return False    # Check if batch_id column contains valid UUIDs    try:        df[batch_id_col].apply(lambda x: str(x))  # Basic validation    except Exception as e:        logger.error("Invalid batch_id values", extra={"error": str(e)})        return False    # Check if asof_ts column contains valid timestamps    try:        pd.to_datetime(df[asof_ts_col])    except Exception as e:        logger.error("Invalid asof_ts values", extra={"error": str(e)})        return False    logger.debug("Lineage columns validation passed", extra={        "batch_id_col": batch_id_col,        "asof_ts_col": asof_ts_col,        "rows": len(df)    })    return Truedef get_lineage_summary(    df: pd.DataFrame,    batch_id_col: str = "batch_id",    asof_ts_col: str = "asof_ts") -> Dict[str, Any]:    """    Get a summary of lineage information from a DataFrame.    Args:        df: DataFrame with lineage columns        batch_id_col: Name of the batch ID column        asof_ts_col: Name of the asof timestamp column    Returns:        Dictionary with lineage summary information    """    if df.empty:        return {"error": "DataFrame is empty"}    if not validate_lineage_columns(df, batch_id_col, asof_ts_col):        return {"error": "Invalid lineage columns"}    # Get unique batch IDs    unique_batches = df[batch_id_col].nunique()    # Get timestamp range    timestamps = pd.to_datetime(df[asof_ts_col])    earliest_ts = timestamps.min()    latest_ts = timestamps.max()    summary = {        "unique_batches": unique_batches,        "earliest_timestamp": earliest_ts.isoformat(),        "latest_timestamp": latest_ts.isoformat(),        "total_rows": len(df),        "lineage_columns": [batch_id_col, asof_ts_col]    }    logger.info("Generated lineage summary", extra=summary)    return summary
+"""
+Lineage management for Fuel Tracker data processing.
+"""
+
+from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+from uuid import uuid4
+
+import pandas as pd
+
+from .contracts import BatchMeta
+from .logging_utils import get_logger
+
+logger = get_logger(__name__)
+
+
+def start_batch(source: str = "EIA", notes: Optional[str] = None) -> BatchMeta:
+    """
+    Start a new data processing batch.
+
+    Args:
+        source: Data source identifier (defaults to "EIA")
+        notes: Optional notes about the batch
+
+    Returns:
+        BatchMeta with new UUID and current UTC timestamp
+    """
+    batch_id = uuid4()
+    asof_ts = datetime.now(timezone.utc)
+
+    batch_meta = BatchMeta(
+        batch_id=batch_id, asof_ts=asof_ts, source=source, notes=notes
+    )
+
+    logger.info(
+        "Started new batch",
+        extra={
+            "batch_id": str(batch_id),
+            "source": source,
+            "asof_ts": asof_ts.isoformat(),
+        },
+    )
+
+    return batch_meta
+
+
+def attach_lineage_columns(
+    df: pd.DataFrame,
+    batch_meta: BatchMeta,
+    batch_id_col: str = "batch_id",
+    asof_ts_col: str = "asof_ts",
+) -> pd.DataFrame:
+    """
+    Attach lineage columns to a DataFrame.
+
+    Args:
+        df: Input DataFrame
+        batch_meta: Batch metadata containing lineage information
+        batch_id_col: Name for the batch ID column
+        asof_ts_col: Name for the asof timestamp column
+
+    Returns:
+        DataFrame with lineage columns added
+    """
+    if df.empty:
+        logger.warning("DataFrame is empty, no lineage columns to add")
+        return df
+
+    # Create a copy to avoid modifying the original
+    df_with_lineage = df.copy()
+
+    # Add lineage columns
+    df_with_lineage[batch_id_col] = batch_meta.batch_id
+    df_with_lineage[asof_ts_col] = batch_meta.asof_ts
+
+    logger.info(
+        "Attached lineage columns to DataFrame",
+        extra={
+            "batch_id": str(batch_meta.batch_id),
+            "rows": len(df_with_lineage),
+            "batch_id_col": batch_id_col,
+            "asof_ts_col": asof_ts_col,
+        },
+    )
+
+    return df_with_lineage
+
+
+def create_lineage_dict(batch_meta: BatchMeta) -> Dict[str, Any]:
+    """
+    Create a dictionary representation of lineage information.
+
+    Args:
+        batch_meta: Batch metadata
+
+    Returns:
+        Dictionary with lineage information
+    """
+    return {
+        "batch_id": str(batch_meta.batch_id),
+        "asof_ts": batch_meta.asof_ts.isoformat(),
+        "source": batch_meta.source,
+        "notes": batch_meta.notes,
+    }
+
+
+def validate_lineage_columns(
+    df: pd.DataFrame, batch_id_col: str = "batch_id", asof_ts_col: str = "asof_ts"
+) -> bool:
+    """
+    Validate that a DataFrame has the required lineage columns.
+
+    Args:
+        df: DataFrame to validate
+        batch_id_col: Expected batch ID column name
+        asof_ts_col: Expected asof timestamp column name
+
+    Returns:
+        True if all required columns are present and valid
+    """
+    required_cols = [batch_id_col, asof_ts_col]
+
+    # Check if required columns exist
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        logger.error(
+            "Missing required lineage columns", extra={"missing_cols": missing_cols}
+        )
+        return False
+
+    # Check if batch_id column contains valid UUIDs
+    try:
+        df[batch_id_col].apply(lambda x: str(x))  # Basic validation
+    except Exception as e:
+        logger.error("Invalid batch_id values", extra={"error": str(e)})
+        return False
+
+    # Check if asof_ts column contains valid timestamps
+    try:
+        pd.to_datetime(df[asof_ts_col])
+    except Exception as e:
+        logger.error("Invalid asof_ts values", extra={"error": str(e)})
+        return False
+
+    logger.debug(
+        "Lineage columns validation passed",
+        extra={
+            "batch_id_col": batch_id_col,
+            "asof_ts_col": asof_ts_col,
+            "rows": len(df),
+        },
+    )
+
+    return True
+
+
+def get_lineage_summary(
+    df: pd.DataFrame, batch_id_col: str = "batch_id", asof_ts_col: str = "asof_ts"
+) -> Dict[str, Any]:
+    """
+    Get a summary of lineage information from a DataFrame.
+
+    Args:
+        df: DataFrame with lineage columns
+        batch_id_col: Name of the batch ID column
+        asof_ts_col: Name of the asof timestamp column
+
+    Returns:
+        Dictionary with lineage summary information
+    """
+    if df.empty:
+        return {"error": "DataFrame is empty"}
+
+    if not validate_lineage_columns(df, batch_id_col, asof_ts_col):
+        return {"error": "Invalid lineage columns"}
+
+    # Get unique batch IDs
+    unique_batches = df[batch_id_col].nunique()
+
+    # Get timestamp range
+    timestamps = pd.to_datetime(df[asof_ts_col])
+    earliest_ts = timestamps.min()
+    latest_ts = timestamps.max()
+
+    summary = {
+        "unique_batches": unique_batches,
+        "earliest_timestamp": earliest_ts.isoformat(),
+        "latest_timestamp": latest_ts.isoformat(),
+        "total_rows": len(df),
+        "lineage_columns": [batch_id_col, asof_ts_col],
+    }
+
+    logger.info("Generated lineage summary", extra=summary)
+    return summary
