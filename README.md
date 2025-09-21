@@ -1,2 +1,281 @@
-# fuel-tracker
-Provide a single, auditable source of truth for fuel indices and surcharge logic used by Accounting/Billing—so rate decisions aren’t a guessing game and analytics can build on stable ground.
+# Fuel Tracker
+
+**A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/badge/ruff-linted-green.svg)](https://github.com/astral-sh/ruff)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+## Why It Matters
+
+**For Accounting & Compliance Teams:**
+- **FERC Account 820**: Direct support for pipeline compressor fuel expense reporting requirements
+- **ASC 980 Compliance**: Probable recovery assessment and regulatory asset recognition for fuel surcharges
+- **GAAP Alignment**: Immutable audit trail with complete data lineage for financial reporting
+- **Form 2/3-Q Bridge**: Monthly data supports quarterly regulatory reporting with variance analysis
+- **Cross-Account Integration**: Supports Accounts 182.3/254 for under/over-recovery tracking
+
+**For Cross-Functional Teams:**
+- **Measurement Teams**: Accurate fuel consumption forecasting for operational planning
+- **Scheduling Teams**: Reliable fuel cost projections for capacity planning
+- **Accounting Teams**: Automated reconciliation and variance analysis workflows
+- **Regulatory Teams**: Compliance-ready data for FERC reporting and rate case support
+- **Single Source of Truth**: Eliminates guesswork in fuel consumption forecasting
+- **Revision-Aware**: Never lose historical data; complete audit trail for all changes
+
+## Features
+
+### 🔄 Revision-Aware Lineage
+- **Batch Tracking**: Every data update creates new `batch_id` with UTC timestamp
+- **Append-Only**: New revisions as PPAs (Point-in-Time Archives); never overwrites
+- **Frozen Backtests**: Each data vintage preserved for reproducible validation
+- **State Idempotence**: Same source snapshot → same outputs; new snapshot → new batch
+
+### 🛡️ Data Integrity & Controls
+- **±2% Tolerance**: Automated validation vs EIA source snapshots
+- **Provisional Mode**: Blocks publishing when upstream stale >3 business days
+- **Exception Flagging**: Out-of-tolerance data automatically flagged for review
+- **Cache Management**: 3-day business day TTL with staleness detection
+
+### 📊 Modeling Portfolio
+- **Seasonal-Naïve**: Baseline model for performance benchmarking
+- **STL+ETS**: Seasonal-Trend decomposition with Exponential Smoothing
+- **SARIMAX**: ARIMA with exogenous variables (HDD/CDD, Henry Hub)
+- **Rolling Backtest**: 60-month lookback, 12-month horizon validation
+
+### 📈 Compliance & Auditability
+- **FERC Alignment**: Designed for Account 820 reporting requirements
+- **ASC 980 Compliance**: Probable recovery assessment for fuel surcharge recognition
+- **Cross-Account Support**: Integration with Accounts 182.3/254 for under/over-recovery
+- **Audit Trail**: Complete lineage logging in JSONL format
+- **Tie-out Process**: Monthly variance analysis with escalation paths
+- **Retention Policy**: 24 months full data; quarterly snapshots beyond
+- **CPA Certification**: Audit-ready documentation for external review
+
+## Quickstart
+
+### Prerequisites
+- Python 3.11+
+- EIA API key ([Get one here](https://www.eia.gov/opendata/register.php))
+
+### Installation
+```bash
+# Clone and install
+git clone <repository-url>
+cd fuel-tracker
+pip install -e .
+
+# Or with conda (recommended for Windows)
+conda install -y -c conda-forge python=3.11 ruff pytest pre-commit detect-secrets
+python -m pip install -r requirements.txt
+```
+
+### Environment Setup
+```bash
+# Set your EIA API key
+export EIA_API_KEY=your_api_key_here
+
+# Or create .env file
+echo "EIA_API_KEY=your_api_key_here" > .env
+```
+
+### Run the Pipeline
+```bash
+# PowerShell (Windows)
+.\run.ps1 all
+
+# Or individual commands
+.\run.ps1 pull        # Fetch data & build panel
+.\run.ps1 backtest    # Run baseline backtest
+.\run.ps1 forecast    # Generate 12-month forecast
+.\run.ps1 status      # Check output status
+
+# Python modules (cross-platform)
+python -m fueltracker.pipeline.fetch_and_build --dry-run
+python -m fueltracker.run_backtest --model baseline --horizon 12
+python -m fueltracker.forecast --model baseline --horizon 12
+```
+
+## Outputs
+
+| File | Description | Format |
+|------|-------------|---------|
+| `outputs/panel_monthly.parquet` | Tidy monthly panel with lineage columns | Parquet |
+| `outputs/metrics.csv` | Rolling-origin backtest metrics + stability flags | CSV |
+| `outputs/forecast_12m.csv` | 12-month forecast with prediction intervals | CSV |
+| `MODEL_CARD.md` | Living model documentation and assumptions | Markdown |
+
+## Data Contracts
+
+### Panel Schema
+| Column | Type | Description |
+|--------|------|-------------|
+| `period` | date | Month-end date (YYYY-MM-DD) |
+| `value_mmcf` | float | Fuel consumption in million cubic feet |
+| `metric` | string | Always "pipeline_compressor_fuel" |
+| `freq` | string | Always "monthly" |
+| `batch_id` | UUID | Unique batch identifier for lineage |
+| `asof_ts` | datetime | UTC timestamp when data was processed |
+
+### Lineage Rules
+- **No Overwrites**: Previous data vintages preserved for auditability
+- **Batch Tracking**: Each update creates new batch with UUID and timestamp
+- **Frozen Panels**: Backtests use data vintage at specific timestamp
+- **State Idempotence**: Same source → same outputs; new source → new batch
+
+## Modeling & Backtesting
+
+### Model Portfolio
+1. **Seasonal-Naïve**: Simple seasonal pattern replication (baseline)
+2. **STL+ETS**: Seasonal-Trend decomposition with Exponential Smoothing
+3. **SARIMAX**: ARIMA with exogenous variables (HDD/CDD, Henry Hub)
+
+### Exogenous Features
+- **HDD/CDD**: Population-weighted heating/cooling degree days
+- **Henry Hub**: Monthly average natural gas spot price
+- **Seasonality**: 12-month seasonal patterns
+
+### Backtest Protocol
+- **Method**: Rolling-origin with frozen panels per data vintage
+- **Window**: 60 months lookback, 12 months horizon
+- **Metrics**: MAE, sMAPE, RMSE, MAPE
+- **Success Criteria**: Beat Seasonal-Naïve by ≥10% median MAE/sMAPE
+- **Stability Tracking**: Alert when top model flips ≥N times across M revisions
+
+## Compliance & Controls
+
+### Tolerance Rules
+- **Source Validation**: ±2% variance vs EIA source snapshot
+- **Exception Handling**: Out-of-tolerance data flagged for review
+- **Provisional Mode**: Blocks publishing when cache stale >3 business days
+
+### Tie-out Process
+- **Monthly**: Variance analysis with ±2% tolerance
+- **Quarterly**: Form 2/3-Q bridge with escalation paths
+- **Annual**: Full compliance audit and system review
+- **CPA Review**: External audit documentation and certification
+- **ASC 980 Assessment**: Probable recovery evaluation for regulatory assets
+
+### Revision Management
+- **Append-Only**: New revisions as PPAs; never overwrites
+- **Retention**: 24 months full data; quarterly snapshots beyond
+- **Audit Trail**: Complete lineage logging in JSONL format
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[EIA API v2] --> B[Fetch & Cache]
+    B --> C[Validate & Contracts]
+    C --> D[Build Monthly Panel<br/>batch_id, asof_ts]
+    D --> E[Backtest Pipeline<br/>rolling-origin]
+    D --> F[Forecast Pipeline<br/>12m + PI]
+    E --> G[metrics.csv<br/>stability log]
+    F --> H[forecast_12m.csv]
+    D --> I[panel_monthly.parquet]
+    C --> J[Compliance Checks<br/>±2% tolerance, provisional mode]
+```
+
+*See [docs/architecture.md](docs/architecture.md) for detailed system design.*
+
+## CLI Examples
+
+### End-to-End Pipeline
+```bash
+# Fresh monthly build
+.\run.ps1 all
+
+# Check status
+.\run.ps1 status
+```
+
+### Backtest Only
+```bash
+# Run baseline backtest
+python -m fueltracker.run_backtest --model baseline --horizon 12 --last-n-months 60
+
+# Run with specific cutoff date
+python -m fueltracker.run_backtest --asof 2024-01-01T00:00:00Z --model sarimax
+```
+
+### Forecast Only
+```bash
+# Generate 12-month forecast
+python -m fueltracker.forecast --model baseline --horizon 12
+
+# Auto-select winning model
+python -m fueltracker.forecast --horizon 12
+```
+
+### Data Pipeline
+```bash
+# Fetch and build panel
+python -m fueltracker.pipeline.fetch_and_build
+
+# Dry run (no files written)
+python -m fueltracker.pipeline.fetch_and_build --dry-run
+```
+
+## Ops Runbook
+
+### If Upstream Fails
+1. Check EIA API status and connectivity
+2. Verify `EIA_API_KEY` environment variable
+3. Review cache staleness (`data/cache/last_success.json`)
+4. Enable provisional mode if cache stale >3 business days
+
+### If Variance >2%
+1. Review source data changes in EIA API
+2. Check for data quality issues or API changes
+3. Escalate to data team for investigation
+4. Document findings in lineage log
+
+### Regenerate Prior Vintage
+```bash
+# Use specific cutoff date for frozen panel
+python -m fueltracker.run_backtest --asof 2024-01-01T00:00:00Z
+python -m fueltracker.forecast --asof 2024-01-01T00:00:00Z
+```
+
+## Roadmap
+
+### Phase 2 (Q2 2024)
+- **Under/Over-Recovery Bridge**: Integration with Accounts 182.3/254
+- **Enhanced Monitoring**: Real-time dashboard and alerting
+- **API Improvements**: Rate limiting and retry logic
+
+### Future Enhancements
+- **Distribution Granularity**: Regional and pipeline-specific forecasting
+- **Advanced Models**: Deep learning and ensemble methods
+- **Integration**: FlowCal/Quorum API connectors
+
+## Contributing
+
+### Development Setup
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run linting
+ruff check .
+
+# Run tests
+pytest -q
+
+# Pre-commit hooks
+pre-commit install
+```
+
+### Code Style
+- **Linting**: Ruff for code quality and formatting
+- **Testing**: pytest for unit and integration tests
+- **Security**: detect-secrets for credential scanning
+- **Commits**: Conventional commit messages
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+**Questions?** Check the [Model Card](MODEL_CARD.md) for detailed assumptions and limitations, or review the [Architecture Guide](docs/architecture.md) for system design details.
