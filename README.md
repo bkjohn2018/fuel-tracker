@@ -53,6 +53,27 @@
 - **Retention Policy**: 24 months full data; quarterly snapshots beyond
 - **CPA Certification**: Audit-ready documentation for external review
 
+### ASC 980 Compliance
+
+Fuel Tracker explicitly supports recognition of regulatory assets and liabilities in accordance with ASC 980, *Regulated Operations*. The system is designed to mirror the requirements of cost-of-service regulation:
+
+- **Scope Criteria (ASC 980-10-15):**
+  - Rates are set or approved by an authorized regulator or governing board.
+  - Rates are cost-based and intended to recover allowable operating costs.
+  - Rates are collectible from customers at levels that will recover the allowable costs.
+
+- **Regulatory Assets (Account 182.3, ASC 980-340):**
+  - Under-recovered fuel costs are recognized as regulatory assets when recovery is probable.
+  - Such costs are amortized over recovery periods and written down if recovery is no longer probable.
+  - Carrying charges may include debt cost of capital, but not equity return.
+
+- **Regulatory Liabilities (Account 254, ASC 980-405):**
+  - Over-recovered fuel costs or probable future refunds are recognized as regulatory liabilities.
+  - Liabilities are reversed when refunded or offset in future rate periods.
+
+- **Fuel Cost Tracker Mechanism:**
+  - Fuel Tracker's variance logging (±2% tolerance) is designed to support fuel cost trackers/true-ups, a common regulatory mechanism explicitly contemplated by ASC 980.
+
 ## Quickstart
 
 ### Prerequisites

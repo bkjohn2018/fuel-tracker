@@ -105,26 +105,27 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 - **Stability Tracking**: Performance change detection
 - **Alert System**: Automated escalation for anomalies
 
-## Accounting Treatment & ASC 980 Compliance
+## Accounting Treatment (ASC 980 Alignment)
 
-### FERC Account Structure
-- **Account 820**: Pipeline Compressor Fuel Expense (primary forecast target)
-- **Account 489**: Transportation Revenue - Fuel Retainage (surcharge collection)
-- **Account 182.3**: Fuel Cost Under-Recovery (deferred regulatory asset)
-- **Account 254**: Fuel Cost Over-Recovery (deferred regulatory liability)
+- **Account 820 – Pipeline Compressor Fuel Expense**
+  Operating expense for consumed fuel.
 
-### ASC 980 Requirements
-- **Probable Recovery**: Forecasts support assessment of probable fuel cost recovery
-- **Regulatory Asset Recognition**: Under-recovery amounts recognized as regulatory assets
-- **Regulatory Liability Recognition**: Over-recovery amounts recognized as regulatory liabilities
-- **Rate Case Support**: Historical data and forecasts support rate case filings
-- **Variance Analysis**: Monthly reconciliation supports regulatory compliance
+- **Account 489 – Transportation Revenue (Fuel Retainage)**
+  Revenue recognition for tariff-based retainage.
 
-### Cross-Account Integration
-- **Fuel Surcharge Calculation**: Forecasts drive fuel surcharge rate determination
-- **Under/Over-Recovery Tracking**: Variance analysis feeds Accounts 182.3/254
-- **Regulatory Reporting**: Data supports FERC Form 2/3-Q quarterly filings
-- **Audit Trail**: Complete lineage supports external audit requirements
+- **Account 182.3 – Regulatory Asset: Fuel Under-Recovery (ASC 980-340)**
+  Incurred fuel costs deferred when recovery through rates is probable.
+  Must be amortized over the recovery period. Write down if recovery is no longer probable.
+  Carrying charges may reflect debt component of allowed cost of capital, but exclude equity return.
+
+- **Account 254 – Regulatory Liability: Fuel Over-Recovery (ASC 980-405)**
+  Probable future refunds or credits to customers recognized as liabilities.
+  Released when refunded or netted in subsequent tariff cycles.
+
+- **Disclosure Requirements:**
+  - Basis for recognition of regulatory assets/liabilities.
+  - Recovery period assumptions.
+  - Rate order or regulatory precedent relied upon.
 
 ## Maintenance & Operations
 - **Monthly Pipeline**: Automated data fetch and panel building
