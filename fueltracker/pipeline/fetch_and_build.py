@@ -52,7 +52,10 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
         if allow_sample_fallback:
             logger.info(
                 "Sample data fallback enabled",
-                extra={"allow_sample_fallback": allow_sample_fallback},
+                extra={
+                    "allow_sample_fallback": allow_sample_fallback,
+                    "ci_env": os.getenv("CI"),
+                },
             )
 
         client = EIAClient(
@@ -61,7 +64,21 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
         )
 
         # Fetch data from EIA API
-        logger.info("Fetching data from EIA API")
+        logger.info(
+            "Fetching data from EIA API",
+            extra={
+                "endpoint": "petroleum/pri/spt/data",
+                "params": {
+                    "frequency": "monthly",
+                    "data[]": "value",
+                    "facets[product][]": "EPD0",
+                    "sort[0][column]": "period",
+                    "sort[0][direction]": "desc",
+                    "offset": 0,
+                    "length": 5000,
+                },
+            },
+        )
         raw_df = client.fetch_series(
             endpoint="petroleum/pri/spt/data",
             params={
@@ -78,7 +95,11 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
         if raw_df.empty:
             logger.error(
                 "No data fetched from EIA API after applying fallbacks",
-                extra={"endpoint": "petroleum/pri/spt/data"},
+                extra={
+                    "endpoint": "petroleum/pri/spt/data",
+                    "allow_sample_fallback": allow_sample_fallback,
+                    "ci_env": os.getenv("CI"),
+                },
             )
             return {
                 "error": "No data fetched",

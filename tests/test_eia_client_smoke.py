@@ -19,7 +19,8 @@ class TestEIAClientSmoke:
         self.api_key = "".join(
             ["test", "_api_key_", "12345"]
         )  # pragma: allowlist secret
-        self.client = EIAClient(self.api_key)
+        # Disable sample fallback by default to test baseline behavior.
+        self.client = EIAClient(self.api_key, allow_sample_fallback=False)
         # Sample EIA API response
         self.sample_response = {
             "response": {
@@ -169,6 +170,21 @@ class TestEIAClientSmoke:
         assert isinstance(result, pd.DataFrame)
         assert len(result) == 3
         assert list(result.columns) == ['period', 'value', 'unit']
+
+    @patch('requests.get')
+    def test_sample_fallback_placeholder_key(self, mock_get):
+        """Test fallback triggers automatically for placeholder API key."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"response": {"data": []}}
+        mock_get.return_value = mock_response
+
+        client = EIAClient("sample-key-placeholder")
+
+        result = client.fetch_series("petroleum/pri/spt/data", {})
+
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 3
 
     @patch('requests.get')
     def test_malformed_response_handling(self, mock_get):

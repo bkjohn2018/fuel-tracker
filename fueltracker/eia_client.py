@@ -142,7 +142,11 @@ class EIAClient:
             if df.empty:
                 logger.warning(
                     "No data found in EIA response",
-                    extra={"endpoint": endpoint, "url": url},
+                    extra={
+                        "endpoint": endpoint,
+                        "url": url,
+                        "params": merged_params,
+                    },
                 )
                 fallback_df = self._maybe_get_sample_data()
                 if fallback_df is not None:
@@ -170,7 +174,12 @@ class EIAClient:
         except Exception as e:
             logger.error(
                 "Failed to fetch EIA series",
-                extra={"endpoint": endpoint, "url": url, "error": str(e)},
+                extra={
+                    "endpoint": endpoint,
+                    "url": url,
+                    "params": merged_params,
+                    "error": str(e),
+                },
             )
             fallback_df = self._maybe_get_sample_data()
             if fallback_df is not None:
@@ -231,7 +240,9 @@ class EIAClient:
         if env_value is not None:
             return env_value.lower() in {"1", "true", "yes", "on"}
 
-        return False
+        placeholder_tokens = {"test", "sample", "demo", "placeholder", "fake", "dummy"}
+        api_key_lower = self.api_key.lower()
+        return any(token in api_key_lower for token in placeholder_tokens)
 
     def _maybe_get_sample_data(self) -> pd.DataFrame | None:
         """Return bundled sample data when fallback policy allows it."""
