@@ -54,7 +54,10 @@ def write_status(
 
 
 def run_pull(mode: str) -> None:
+    from fueltracker.config import OUTPUTS_DIR, PANEL_FILE
+    from fueltracker.io_parquet import read_panel
     from fueltracker.pipeline.fetch_and_build import fetch_and_build_panel
+    from fueltracker.validate import validate_panel
 
     results = fetch_and_build_panel(dry_run=False)
     if "error" in results:
@@ -69,6 +72,24 @@ def run_pull(mode: str) -> None:
             )
             return
         raise ValidationWarning(results.get("error", "unknown"))
+
+    # Validate produced panel
+    panel_path = OUTPUTS_DIR / PANEL_FILE
+    panel_df = read_panel(panel_path)
+    snapshot = None  # Load a prior snapshot here if available
+    issues = validate_panel(panel_df, snapshot)
+
+    if issues:
+        if mode == "ci":
+            write_status(
+                "needs_review",
+                issues,
+                extra={
+                    "provisional": bool(results.get("provisional", False)),
+                },
+            )
+            return
+        raise ValidationWarning("; ".join(issues))
 
     write_status(
         "ok",
