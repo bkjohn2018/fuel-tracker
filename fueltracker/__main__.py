@@ -1,1 +1,20 @@
-"""Main entry point for the fueltracker package.Run with: python -m fueltracker"""from . import __version__def main():    """Display a friendly banner with version information."""    banner = f"""╔══════════════════════════════════════════════════════════════╗║                    FUEL TRACKER v{__version__:<8}                    ║║                                                              ║║  A Python package for tracking fuel prices and consumption   ║║                                                              ║╚══════════════════════════════════════════════════════════════╝"""    print(banner)if __name__ == "__main__":    main()
+"""Main entry point for the fueltracker package.
+
+Run with: `python -m fueltracker`.
+"""
+
+from . import __version__
+
+
+def main() -> None:
+    """Display a simple banner with version information."""
+    lines = [
+        "Fuel Tracker",
+        f"Version: {__version__}",
+        "A compliance-focused pipeline for fuel forecasting.",
+    ]
+    print("\n".join(lines))
+
+
+if __name__ == "__main__":
+    main()
