@@ -155,6 +155,22 @@ class TestEIAClientSmoke:
         assert len(result) == 0
 
     @patch('requests.get')
+    def test_sample_fallback_enabled(self, mock_get):
+        """Test fallback to bundled sample data when enabled."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"response": {"data": []}}
+        mock_get.return_value = mock_response
+
+        client = EIAClient(self.api_key, allow_sample_fallback=True)
+
+        result = client.fetch_series("petroleum/pri/spt/data", {})
+
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 3
+        assert list(result.columns) == ['period', 'value', 'unit']
+
+    @patch('requests.get')
     def test_malformed_response_handling(self, mock_get):
         """Test handling of malformed API responses."""
         # Mock malformed response

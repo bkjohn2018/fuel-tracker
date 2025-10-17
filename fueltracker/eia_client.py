@@ -1,7 +1,8 @@
-"""
-EIA v2 API client with retry logic and data normalization.
-"""
+"""EIA v2 API client with retry logic, normalization, and fallbacks."""
 
+from __future__ import annotations
+
+import os
 from typing import Any, Dict
 
 import pandas as pd
@@ -23,7 +24,7 @@ class EIAClient:
 
     BASE_URL = "https://api.eia.gov/v2"
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, *, allow_sample_fallback: bool | None = None):
         """
         Initialize EIA client.
 
@@ -31,6 +32,11 @@ class EIAClient:
             api_key: EIA API key for authentication
         """
         self.api_key = api_key
+        self.allow_sample_fallback = (
+            allow_sample_fallback
+            if allow_sample_fallback is not None
+            else self._determine_sample_policy()
+        )
         logger.info("EIA client initialized", extra={"base_url": self.BASE_URL})
 
     @retry(
@@ -131,8 +137,23 @@ class EIAClient:
             )
             data = self._get(url, merged_params)
 
-            # Normalize JSON response to DataFrame
             df = self._normalize_response(data)
+
+            if df.empty:
+                logger.warning(
+                    "No data found in EIA response",
+                    extra={"endpoint": endpoint, "url": url},
+                )
+                fallback_df = self._maybe_get_sample_data()
+                if fallback_df is not None:
+                    logger.info(
+                        "Using sample fallback data",
+                        extra={
+                            "endpoint": endpoint,
+                            "rows": len(fallback_df),
+                        },
+                    )
+                    return fallback_df
 
             logger.info(
                 "Series fetched successfully",
@@ -151,6 +172,13 @@ class EIAClient:
                 "Failed to fetch EIA series",
                 extra={"endpoint": endpoint, "url": url, "error": str(e)},
             )
+            fallback_df = self._maybe_get_sample_data()
+            if fallback_df is not None:
+                logger.info(
+                    "Using sample fallback data after fetch failure",
+                    extra={"endpoint": endpoint, "rows": len(fallback_df)},
+                )
+                return fallback_df
             raise
 
     def _normalize_response(self, data: Dict[str, Any]) -> pd.DataFrame:
@@ -191,3 +219,47 @@ class EIAClient:
         except Exception as e:
             logger.error("Failed to normalize EIA response", extra={"error": str(e)})
             raise ValueError(f"Failed to normalize EIA response: {e}") from e
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _determine_sample_policy(self) -> bool:
+        """Decide whether the client should fall back to bundled sample data."""
+
+        env_value = os.getenv("FUELTRACKER_ALLOW_SAMPLE_DATA")
+        if env_value is not None:
+            return env_value.lower() in {"1", "true", "yes", "on"}
+
+        return False
+
+    def _maybe_get_sample_data(self) -> pd.DataFrame | None:
+        """Return bundled sample data when fallback policy allows it."""
+
+        if not self.allow_sample_fallback:
+            return None
+
+        sample_payload = {
+            "response": {
+                "data": [
+                    {
+                        "period": "2024-01",
+                        "value": "75.50",
+                        "unit": "dollars per barrel",
+                    },
+                    {
+                        "period": "2024-02",
+                        "value": "78.20",
+                        "unit": "dollars per barrel",
+                    },
+                    {
+                        "period": "2024-03",
+                        "value": "82.10",
+                        "unit": "dollars per barrel",
+                    },
+                ]
+            }
+        }
+
+        logger.debug("Loaded bundled sample data for fallback")
+        return self._normalize_response(sample_payload)

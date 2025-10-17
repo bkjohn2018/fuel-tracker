@@ -3,6 +3,7 @@ Pipeline for fetching EIA data and building monthly panel.
 """
 
 import argparse
+import os
 import sys
 from typing import Any, Dict
 
@@ -42,7 +43,22 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
         if not EIA_API_KEY:
             raise ValueError("EIA_API_KEY not found in environment")
 
-        client = EIAClient(EIA_API_KEY)
+        fallback_env = os.getenv("FUELTRACKER_ALLOW_SAMPLE_DATA")
+        if fallback_env is None:
+            allow_sample_fallback = os.getenv("CI", "").lower() == "true"
+        else:
+            allow_sample_fallback = fallback_env.lower() in {"1", "true", "yes", "on"}
+
+        if allow_sample_fallback:
+            logger.info(
+                "Sample data fallback enabled",
+                extra={"allow_sample_fallback": allow_sample_fallback},
+            )
+
+        client = EIAClient(
+            EIA_API_KEY,
+            allow_sample_fallback=allow_sample_fallback,
+        )
 
         # Fetch data from EIA API
         logger.info("Fetching data from EIA API")
@@ -60,8 +76,14 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
         )
 
         if raw_df.empty:
-            logger.warning("No data fetched from EIA API")
-            return {"error": "No data fetched", "batch_id": str(batch.batch_id)}
+            logger.error(
+                "No data fetched from EIA API after applying fallbacks",
+                extra={"endpoint": "petroleum/pri/spt/data"},
+            )
+            return {
+                "error": "No data fetched",
+                "batch_id": str(batch.batch_id),
+            }
 
         logger.info(
             "Data fetched from EIA API",
@@ -152,11 +174,11 @@ def main():
         results = fetch_and_build_panel(dry_run=args.dry_run)
 
         if "error" in results:
-            print(f"❌ Pipeline failed: {results['error']}")
+            print(f"ERROR: Pipeline failed: {results['error']}")
             sys.exit(1)
 
         # Print results
-        print("\n🚀 Pipeline Results:")
+        print("\nPipeline Results:")
         print(f"   Batch ID: {results['batch_id']}")
         print(f"   Timestamp: {results['asof_ts']}")
         print(f"   Raw data rows: {results['raw_rows']}")
@@ -171,14 +193,14 @@ def main():
             )
 
         if args.dry_run:
-            print("\n🔍 DRY RUN - No files written")
+            print("\nDRY RUN - No files written")
         else:
-            print("\n✅ Pipeline completed - files written")
+            print("\nSUCCESS: Pipeline completed - files written")
 
         sys.exit(0)
 
     except Exception as e:
-        print(f"❌ Pipeline failed: {e}")
+        print(f"ERROR: Pipeline failed: {e}")
         sys.exit(1)
 
 
