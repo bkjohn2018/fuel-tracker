@@ -32,6 +32,7 @@ class EIAClient:
             api_key: EIA API key for authentication
         """
         self.api_key = api_key
+        self.used_sample_fallback = False
         self.allow_sample_fallback = (
             allow_sample_fallback
             if allow_sample_fallback is not None
@@ -157,6 +158,7 @@ class EIAClient:
                             "rows": len(fallback_df),
                         },
                     )
+                    self.used_sample_fallback = True
                     return fallback_df
 
             logger.info(
@@ -187,6 +189,7 @@ class EIAClient:
                     "Using sample fallback data after fetch failure",
                     extra={"endpoint": endpoint, "rows": len(fallback_df)},
                 )
+                self.used_sample_fallback = True
                 return fallback_df
             raise
 

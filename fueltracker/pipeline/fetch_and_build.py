@@ -3,9 +3,10 @@ Pipeline for fetching EIA data and building monthly panel.
 """
 
 import argparse
+import json
 import os
 import sys
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from ..config import OUTPUTS_DIR, PANEL_FILE
 from ..eia_client import EIAClient
@@ -18,6 +19,51 @@ logger = get_logger(__name__)
 
 # Lineage log file
 LINEAGE_LOG_FILE = OUTPUTS_DIR / "lineage_log.jsonl"
+
+
+def _get_mode() -> str:
+    """Return execution mode: 'ci' or 'publish' (default)."""
+    mode = os.getenv("FT_MODE", "publish").lower()
+    return mode if mode in {"ci", "publish"} else "publish"
+
+
+def _write_status(status: Dict[str, Any]) -> None:
+    from ..config import OUTPUTS_DIR
+
+    OUTPUTS_DIR.mkdir(exist_ok=True)
+    status_path = OUTPUTS_DIR / "status.json"
+    with open(status_path, "w", encoding="utf-8") as f:
+        json.dump(status, f, indent=2)
+
+
+def _write_notice(provisional: bool, reasons: List[str]) -> None:
+    from ..config import OUTPUTS_DIR
+
+    if not provisional:
+        return
+    notice = (
+        "This run used SAMPLE DATA due to missing/failed EIA API calls.\n"
+        "Artifacts are provisional and not for publish.\n"
+        f"Reasons: {', '.join(reasons)}\n"
+    )
+    with open(OUTPUTS_DIR / "FORECAST_NOTICE.txt", "w", encoding="utf-8") as f:
+        f.write(notice)
+
+
+def _write_run_meta(
+    batch_id: str, asof_ts: str, provisional: bool, reasons: List[str]
+) -> None:
+    from ..config import OUTPUTS_DIR
+
+    meta = {
+        "batch_id": batch_id,
+        "asof_ts": asof_ts,
+        "ci": _get_mode() == "ci",
+        "provisional": provisional,
+        "reasons": reasons,
+    }
+    with open(OUTPUTS_DIR / "run_meta.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
 
 
 def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
@@ -104,6 +150,8 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
             return {
                 "error": "No data fetched",
                 "batch_id": str(batch.batch_id),
+                "provisional": False,
+                "reasons": ["empty_eia_response"],
             }
 
         logger.info(
@@ -144,6 +192,12 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
             "rows_to_add": rows_to_add,
             "date_range": panel_summary.get("date_range", {}),
             "dry_run": dry_run,
+            "provisional": getattr(client, "used_sample_fallback", False),
+            "reasons": (
+                ["sample_fallback"]
+                if getattr(client, "used_sample_fallback", False)
+                else []
+            ),
         }
 
         logger.info("Pipeline completed successfully", extra=results)
@@ -170,6 +224,14 @@ def fetch_and_build_panel(dry_run: bool = False) -> Dict[str, Any]:
                     "lineage_log_path": str(LINEAGE_LOG_FILE),
                 },
             )
+            # Write run metadata & notice
+            _write_run_meta(
+                batch_id=str(batch.batch_id),
+                asof_ts=batch.asof_ts.isoformat(),
+                provisional=results["provisional"],
+                reasons=results["reasons"],
+            )
+            _write_notice(results["provisional"], results["reasons"])
         else:
             logger.info("Dry run completed - no files written")
 
@@ -195,8 +257,19 @@ def main():
         results = fetch_and_build_panel(dry_run=args.dry_run)
 
         if "error" in results:
+            mode = _get_mode()
+            if mode == "ci":
+                status = {
+                    "status": "needs_review",
+                    "error": results.get("error"),
+                    "batch_id": results.get("batch_id"),
+                    "reasons": results.get("reasons", []),
+                }
+                _write_status(status)
+                print("WARNING: CI soft-fail. See outputs/status.json for details.")
+                sys.exit(0)
             print(f"ERROR: Pipeline failed: {results['error']}")
-            sys.exit(1)
+            sys.exit(2)
 
         # Print results
         print("\nPipeline Results:")
@@ -221,8 +294,13 @@ def main():
         sys.exit(0)
 
     except Exception as e:
+        mode = _get_mode()
+        if mode == "ci":
+            _write_status({"status": "error", "error": str(e)})
+            print("WARNING: CI soft-fail due to exception. See outputs/status.json.")
+            sys.exit(0)
         print(f"ERROR: Pipeline failed: {e}")
-        sys.exit(1)
+        sys.exit(3)
 
 
 if __name__ == "__main__":
