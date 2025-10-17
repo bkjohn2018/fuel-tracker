@@ -1,4 +1,4 @@
-﻿# Fuel Tracker
+# Fuel Tracker
 
 **A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
 
@@ -286,7 +286,7 @@ python -m fueltracker.forecast --asof 2024-01-01T00:00:00Z
 
 ## Roadmap
 
-### Phase 2 (Q2 2024)
+### Phase 2
 - **Under/Over-Recovery Bridge**: Integration with Accounts 182.3/254
 - **Enhanced Monitoring**: Real-time dashboard and alerting
 - **API Improvements**: Rate limiting and retry logic
