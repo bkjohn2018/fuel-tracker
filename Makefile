@@ -52,21 +52,18 @@ build:
 
 # Pull data from EIA API and build panel
 pull:
-	@echo "Pulling data from EIA API and building panel..."
-	python -m fueltracker.pipeline.fetch_and_build
-	@echo "Data pull complete!"
+	@echo "==> fueltracker pull (mode=$${FT_MODE:-publish})"
+	python -m fueltracker.cli pull --mode "$$${FT_MODE:-publish}"
 
 # Run baseline backtest on last 60 months (with ASOF date)
 backtest:
-	@echo "Running baseline backtest on last 60 months..."
-	python -m fueltracker.run_backtest --model baseline --last-n-months 60 --asof $(ASOF)
-	@echo "Backtest complete!"
+	@echo "==> fueltracker backtest (mode=$${FT_MODE:-publish})"
+	python -m fueltracker.cli backtest --mode "$$${FT_MODE:-publish}"
 
 # Generate forecast using winning model (with ASOF date)
 forecast:
-	@echo "Generating forecast using winning model..."
-	python -m fueltracker.forecast --horizon 12 --asof $(ASOF)
-	@echo "Forecast complete!"
+	@echo "==> fueltracker forecast (mode=$${FT_MODE:-publish})"
+	python -m fueltracker.cli forecast --mode "$$${FT_MODE:-publish}"
 
 # Clean up generated files and caches
 clean:
