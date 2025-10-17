@@ -99,13 +99,16 @@ jobs:
           python -m pip install -U pip
           pip install -r requirements.txt
 
-      - name: Check EIA secret presence
+      - name: Check if EIA_API_KEY is present
         run: |
-          if [ -z "${{ secrets.EIA_API_KEY }}" ]; then
-            echo "EIA_API_KEY is NOT set for this run (CI fallback will be used)."
+          if [ -z "$EIA_API_KEY" ]; then
+            echo "EIA_API_KEY is NOT available in this job."
+            exit 1
           else
-            echo "EIA_API_KEY is present (masked)."
+            echo "EIA_API_KEY detected (masked)."
           fi
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
 
       # Secret is scoped ONLY to the steps that need it
       - name: Pull data + build panel
