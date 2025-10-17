@@ -73,6 +73,17 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 - **Confidence Level**: 95% (configurable)
 
 ## Compliance & Controls
+### Lineage Philosophy: PTA vs. PPA
+
+In accounting, Prior Period Adjustments (PPAs) are formal restatements of prior financial results to reflect new or corrected information under GAAP/FERC guidance.
+In Fuel Tracker, the analogous concept for forecasting and reconciliation is the Point-in-Time Archive (PTA) — a complete analytical snapshot that captures all data and model context as they existed at a specific time.
+
+- PPA (Accounting) → Ensures financial transparency and compliance for restatements.
+- PTA (Analytics) → Ensures analytical reproducibility and lineage integrity across forecast vintages.
+
+Each PTA carries a unique `batch_id` and `asof_ts`, forming a verifiable lineage chain that allows the system to reproduce any historical forecast or reconciliation exactly as it was run.
+
+This deliberate terminology avoids confusion for accounting and audit audiences, reinforcing that Fuel Tracker’s revision logic is analytical, not financial — designed to preserve the integrity of forecasts, not to restate results.
 - **FERC Alignment**: Designed for Account 820 reporting requirements
 - **ASC 980 Compliance**: Probable recovery assessment for fuel surcharge recognition
 - **GAAP Compliance**: Audit trail supports financial reporting
