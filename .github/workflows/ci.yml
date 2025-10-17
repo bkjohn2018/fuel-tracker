@@ -154,4 +154,21 @@ jobs:
           path: |
             logs/**
             outputs/**
+
+      - name: Step summary
+        if: always()
+        run: |
+          echo "## Fuel Tracker CI Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f outputs/status.json ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`outputs/status.json\`" >> $GITHUB_STEP_SUMMARY
+            cat outputs/status.json >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**No status.json produced.** See step logs." >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f outputs/CI_SUMMARY.txt ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`outputs/CI_SUMMARY.txt\`" >> $GITHUB_STEP_SUMMARY
+            cat outputs/CI_SUMMARY.txt >> $GITHUB_STEP_SUMMARY
+          fi
             outputs/CI_SUMMARY.txt

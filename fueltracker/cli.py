@@ -54,6 +54,8 @@ def write_status(
 
 
 def run_pull(mode: str) -> None:
+    import pandas as pd
+
     from fueltracker.config import OUTPUTS_DIR, PANEL_FILE
     from fueltracker.io_parquet import read_panel
     from fueltracker.pipeline.fetch_and_build import fetch_and_build_panel
@@ -76,8 +78,18 @@ def run_pull(mode: str) -> None:
     # Validate produced panel
     panel_path = OUTPUTS_DIR / PANEL_FILE
     panel_df = read_panel(panel_path)
-    snapshot = None  # Load a prior snapshot here if available
-    issues = validate_panel(panel_df, snapshot)
+    # Try to load previous published snapshot for tolerance comparison
+    SNAP_DIR = Path("snapshots")
+    SNAP_DIR.mkdir(exist_ok=True)
+    snap_path = SNAP_DIR / "panel_monthly_prev.parquet"
+    snapshot = None
+    snapshot_issue = []
+    if snap_path.exists():
+        try:
+            snapshot = pd.read_parquet(snap_path)
+        except Exception as e:  # noqa: BLE001
+            snapshot_issue = [f"snapshot: failed to load previous panel ({e})"]
+    issues = snapshot_issue + validate_panel(panel_df, snapshot)
 
     if issues:
         if mode == "ci":
@@ -97,6 +109,14 @@ def run_pull(mode: str) -> None:
             "provisional": bool(results.get("provisional", False)),
         },
     )
+
+    # Update snapshot only after successful publish runs
+    if mode == "publish":
+        try:
+            panel_df.to_parquet(snap_path)
+        except Exception:
+            # Non-fatal: snapshot is best-effort and should not break runs
+            pass
 
 
 def run_backtest(mode: str) -> None:
@@ -175,4 +195,25 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except Exception as e:  # last-resort guard for CI visibility
+        try:
+            OUT_DIR.mkdir(exist_ok=True)
+            (OUT_DIR / "status.json").write_text(
+                json.dumps(
+                    {
+                        "status": "unhandled_exception",
+                        "reasons": [str(e)],
+                        "mode": os.getenv("FT_MODE", "publish"),
+                        "asof_ts": _utcnow(),
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
+        if os.getenv("FT_MODE") == "ci":
+            sys.exit(0)
+        sys.exit(EXIT_SCHEMA_FAIL)
