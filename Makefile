@@ -65,6 +65,22 @@ forecast:
 	@echo "==> fueltracker forecast (mode=$${FT_MODE:-publish})"
 	python -m fueltracker.cli forecast --mode "$$${FT_MODE:-publish}"
 
+# Snapshot utilities
+.PHONY: snapshot-show snapshot-seed snapshot-clear
+
+snapshot-show:
+	@ls -lh snapshots || true
+
+snapshot-seed:
+	@test -n "$(SRC)" || (echo "Usage: make snapshot-seed SRC=path/to/panel.parquet" && exit 1)
+	mkdir -p snapshots
+cp -f "$(SRC)" snapshots/panel_monthly_prev.parquet
+	@echo "Seeded snapshot from $(SRC)"
+
+snapshot-clear:
+	rm -f snapshots/panel_monthly_prev.parquet
+	@echo "Snapshot cleared"
+
 # Clean up generated files and caches
 clean:
 	@echo "Cleaning up generated files and caches..."

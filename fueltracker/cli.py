@@ -41,6 +41,7 @@ def write_status(
 ) -> None:
     OUT_DIR.mkdir(exist_ok=True)
     payload: Dict[str, Any] = {
+        "schema_version": 1,
         "status": status,
         "reasons": reasons or [],
         "mode": os.getenv("FT_MODE", "publish"),
@@ -62,6 +63,9 @@ def run_pull(mode: str) -> None:
     from fueltracker.validate import validate_panel
 
     results = fetch_and_build_panel(dry_run=False)
+    # Block publish if result is provisional
+    if mode == "publish" and bool(results.get("provisional", False)):
+        raise ValidationWarning("provisional data — publish blocked")
     if "error" in results:
         # Soft in CI mode
         if mode == "ci":
@@ -119,11 +123,11 @@ def run_pull(mode: str) -> None:
             pass
 
 
-def run_backtest(mode: str) -> None:
+def run_backtest(mode: str, model: str = "baseline", horizon: int = 12) -> None:
     from fueltracker.backtest import run_backtest_pipeline
 
     try:
-        results = run_backtest_pipeline()
+        results = run_backtest_pipeline(model=model, horizon=horizon)
     except Exception as e:  # noqa: BLE001 - map to API fail for CI summary
         if mode == "ci":
             write_status("api_failed", [str(e)])
@@ -139,11 +143,11 @@ def run_backtest(mode: str) -> None:
     write_status("ok")
 
 
-def run_forecast(mode: str) -> None:
+def run_forecast(mode: str, model: str = "baseline", horizon: int = 12) -> None:
     from fueltracker.forecast import run_forecast_pipeline
 
     try:
-        results = run_forecast_pipeline()
+        results = run_forecast_pipeline(model=model, horizon=horizon)
     except Exception as e:  # noqa: BLE001
         if mode == "ci":
             write_status("api_failed", [str(e)])
@@ -162,13 +166,39 @@ def run_forecast(mode: str) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(prog="fueltracker")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    for name in ("pull", "backtest", "forecast"):
-        s = sub.add_parser(name)
-        s.add_argument(
-            "--mode",
-            choices=["ci", "publish"],
-            default=os.getenv("FT_MODE", "publish"),
-        )
+    # pull
+    s_pull = sub.add_parser("pull")
+    s_pull.add_argument(
+        "--mode",
+        choices=["ci", "publish"],
+        default=os.getenv("FT_MODE", "publish"),
+    )
+    # backtest
+    s_bt = sub.add_parser("backtest")
+    s_bt.add_argument(
+        "--mode",
+        choices=["ci", "publish"],
+        default=os.getenv("FT_MODE", "publish"),
+    )
+    s_bt.add_argument(
+        "--model",
+        choices=["baseline", "stl_ets", "sarimax"],
+        default="baseline",
+    )
+    s_bt.add_argument("--horizon", type=int, default=12)
+    # forecast
+    s_fc = sub.add_parser("forecast")
+    s_fc.add_argument(
+        "--mode",
+        choices=["ci", "publish"],
+        default=os.getenv("FT_MODE", "publish"),
+    )
+    s_fc.add_argument(
+        "--model",
+        choices=["baseline", "stl_ets", "sarimax"],
+        default="baseline",
+    )
+    s_fc.add_argument("--horizon", type=int, default=12)
 
     args = parser.parse_args()
 
@@ -176,9 +206,9 @@ def main() -> int:
         if args.cmd == "pull":
             run_pull(args.mode)
         elif args.cmd == "backtest":
-            run_backtest(args.mode)
+            run_backtest(args.mode, args.model, args.horizon)
         elif args.cmd == "forecast":
-            run_forecast(args.mode)
+            run_forecast(args.mode, args.model, args.horizon)
         return EXIT_OK
     except ValidationWarning as w:
         if args.mode == "ci":

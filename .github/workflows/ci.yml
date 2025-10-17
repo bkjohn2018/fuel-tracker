@@ -154,6 +154,45 @@ jobs:
           path: |
             logs/**
             outputs/**
+  publish:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [lint-and-test]
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FT_MODE: publish
+      EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt && pip install -e .
+      - name: Pull/backtest/forecast (publish)
+        run: |
+          make pull
+          make backtest
+          make forecast
+      - name: Gate on status=ok
+        run: |
+          python - << 'PY'
+          import json, sys
+          from pathlib import Path
+          p = Path('outputs/status.json')
+          if not p.exists():
+              print('Publish blocked: outputs/status.json not found', file=sys.stderr)
+              sys.exit(1)
+          data = json.loads(p.read_text())
+          if data.get('status') != 'ok':
+              print('Publish blocked: status.json != ok', file=sys.stderr)
+              print(json.dumps(data, indent=2))
+              sys.exit(1)
+          print('Publish gate passed: status=ok')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: publish-artifacts
+          path: outputs/**
 
       - name: Step summary
         if: always()
