@@ -1,3 +1,81 @@
+# FIRE (Fuel Integrity & Reconciliation Engine) Architecture
+
+## Overview
+The FIRE system is designed as a compliance-focused, revision-aware data pipeline for forecasting US pipeline compressor fuel consumption. The architecture emphasizes auditability, reproducibility, and regulatory compliance for FERC Account 820 reporting.
+
+## System Architecture
+
+```mermaid
+flowchart LR
+    A[EIA API v2] --> B[Fetch & Cache]
+    B --> C[Validate & Contracts]
+    C --> D[Build Monthly Panel<br/>batch_id, asof_ts]
+    D --> E[Backtest Pipeline<br/>rolling-origin]
+    D --> F[Forecast Pipeline<br/>12m + PI]
+    E --> G[metrics.csv<br/>stability log]
+    F --> H[forecast_12m.csv]
+    D --> I[panel_monthly.parquet]
+    C --> J[Compliance Checks<br/>+/- 2% tolerance, provisional mode]
+    J --> K[Publish Decision]
+    K --> L[Lineage Log<br/>JSONL audit trail]
+```
+
+## Core Components
+
+### 1. Data Ingestion Layer
+- **EIA Client** (`eia_client.py`): Handles API communication with EIA v2
+- **Cache Management** (`cache.py`): Implements 3-day business day TTL
+- **Endpoint Configuration** (`config/eia_endpoints.yml`): Parameterized API endpoints
+
+### 2. Data Processing Layer
+- **Panel Builder** (`panel.py`): Transforms raw data into standardized monthly panel
+- **Schema Validation** (`contracts.py`): Pydantic v2 models for data integrity
+- **Lineage Tracking** (`lineage.py`): UUID-based batch tracking with timestamps
+
+### 3. Modeling Layer
+- **Baseline Model** (`models/baseline.py`): Seasonal-Naive forecasting
+- **STL+ETS Model** (`models/stl_ets.py`): Seasonal-Trend decomposition
+- **SARIMAX Model** (`models/sarimax.py`): ARIMA with exogenous variables
+
+### 4. Backtesting & Forecasting
+- **Backtest Engine** (`backtest.py`): Rolling-origin validation with frozen panels
+- **Forecast Engine** (`forecast.py`): 12-month forecasting with prediction intervals
+- **Model Selection**: Performance-based winner selection
+
+### 5. Compliance & Controls
+- **Provisional Mode** (`provisional.py`): Blocks publishing when cache stale
+- **Tolerance Validation**: +/- 2% variance checking vs source
+- **Audit Trail**: Complete lineage logging in JSONL format
+
+## Data Flow
+
+### Monthly Pipeline Execution
+1. **Data Fetch**: EIA API + Cache validation + Raw data retrieval
+2. **Schema Mapping**: Raw data -> MonthlyFuelRow schema with lineage
+3. **Panel Building**: Standardized monthly panel with batch metadata
+4. **Compliance Check**: Tolerance validation and provisional mode check
+5. **Backtesting**: Rolling-origin validation on frozen data vintage
+6. **Forecasting**: 12-month forecast with prediction intervals
+7. **Output Generation**: Parquet panel, CSV metrics, CSV forecast
+8. **Lineage Logging**: Complete audit trail in JSONL format
+
+### Revision Management
+- **Append-Only**: New data creates new batch, never overwrites
+- **Frozen Panels**: Backtests use data vintage at specific timestamp
+- **State Idempotence**: Same source -> same outputs; new source -> new batch
+- **Rollback Capability**: Previous forecasts preserved in lineage
+
+## Data Contracts
+
+### Panel Schema (MonthlyFuelRow)
+```python
+{
+    "period": date,           # Month-end date
+    "value_mmcf": float,      # Fuel consumption in MMcf
+    "metric": "pipeline_compressor_fuel",
+    "freq": "monthly",
+    "lineage": BatchMeta      # batch_id, asof_ts, source, notes
+}
 ```mermaid
 flowchart TD
   A[Fuel Variance > 2%] --> B[True-up Analysis]

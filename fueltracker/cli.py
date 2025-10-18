@@ -167,8 +167,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         prog="fueltracker",
         description=(
-            "FIRE (Fuel Integrity & Reconciliation Engine) — compressor-fuel "
-            "reconciliation & lineage. (formerly 'Fuel Tracker')."
+            "FIRE (Fuel Integrity & Reconciliation Engine) - compressor-fuel "
+            "reconciliation & lineage. (formerly \"Fuel Tracker\")."
         ),
     )
     sub = parser.add_subparsers(dest="cmd", required=True)

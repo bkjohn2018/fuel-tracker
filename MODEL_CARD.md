@@ -24,7 +24,7 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 - **Data Quality**: ±2% tolerance vs source snapshot
 
 ## Model Family
-1. **Seasonal-Naïve Baseline**: Simple seasonal pattern replication
+1. **Seasonal-Naive Baseline**: Simple seasonal pattern replication
 2. **STL+ETS**: Seasonal-Trend decomposition with Exponential Smoothing
 3. **SARIMAX**: Seasonal ARIMA with eXogenous variables (HDD/CDD, Henry Hub)
 
@@ -42,17 +42,17 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 - **Window**: Rolling window approach
 - **Metrics**: MAE, sMAPE, RMSE, MAPE
 - **Validation**: Time series cross-validation
-- **Success Criteria**: Beat Seasonal-Naïve by ≥10% median MAE/sMAPE
+- **Success Criteria**: Beat Seasonal-Naive by >=10% median MAE/sMAPE
 
 ## Lineage & Reproducibility
 - **Batch Tracking**: Each data update creates new batch with UUID and UTC timestamp
 - **Append-Only**: Panel data uses append-only revisions with lineage tracking
 - **No Overwrites**: Previous data vintages preserved for auditability
 - **Frozen Panels**: Backtests use frozen panels per data vintage
-- **State Idempotence**: Same source snapshot → same outputs; new snapshot → new batch_id
+- **State Idempotence**: Same source snapshot -> same outputs; new snapshot -> new batch_id
 
 ## Tolerance Rules & Data Integrity
-- **Source Tolerance**: ±2% variance vs EIA source snapshot
+- **Source Tolerance**: +/- 2% variance vs EIA source snapshot
 - **Exception Handling**: Out-of-tolerance data flagged for review
 - **Provisional Mode**: Blocks publishing when cache stale >3 business days
 - **Cache TTL**: 3 business days maximum staleness
@@ -60,7 +60,7 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 
 ## Stability Log & Escalation
 - **Model Performance Tracking**: Rolling performance metrics across revisions
-- **Stability Flags**: Alert when top model flips ≥N times across M revisions
+- **Stability Flags**: Alert when top model flips >= N times across M revisions
 - **Revision Logging**: Complete audit trail in JSONL format
 - **Escalation Path**: Variance >2% triggers review process
 - **Rollback Capability**: Previous forecasts preserved in lineage log
@@ -155,7 +155,7 @@ This deliberate terminology avoids confusion for accounting and audit audiences,
 
 ## Release Checklist
 - [ ] Data fresh within 3 business days
-- [ ] Tolerance within ±2% bounds
+- [ ] Tolerance within +/- 2% bounds
 - [ ] CI/CD pipeline green
 - [ ] Backtest metrics acceptable
 - [ ] Model card updated
