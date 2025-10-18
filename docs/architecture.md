@@ -162,8 +162,8 @@ flowchart LR
 flowchart TD
   A[Fuel Variance > 2%] --> B[True-up Analysis]
   B --> C{Under vs Over Recovery?}
-  C -->|Under| D[Recognize Regulatory Asset 182_3]
-  C -->|Over|  E[Recognize Regulatory Liability 254]
+  C -->|Under| D[Recognize Regulatory Asset 182.3]
+  C -->|Over| E[Recognize Regulatory Liability 254]
   D --> F[Disclosure: Probable Recovery per ASC 980-340]
   E --> G[Disclosure: Probable Refund per ASC 980-405]
   F --> H[Regulatory Reporting: Form 2 and 3-Q]
