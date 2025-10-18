@@ -42,7 +42,7 @@ jobs:
                       errs.append(f"{t}: {e}")
           if errs:
               print("\n".join(errs)); sys.exit(1)
-PY
+          PY
 
       - name: Cache pip
         uses: actions/cache@v4
@@ -206,7 +206,7 @@ PY
                       errs.append(f"{t}: {e}")
           if errs:
               print("\n".join(errs)); sys.exit(1)
-PY
+          PY
       - run: pip install -r requirements.txt && pip install -e .
       - name: Pull/backtest/forecast (publish)
         run: |
