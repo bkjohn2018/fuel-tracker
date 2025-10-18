@@ -251,4 +251,3 @@ PY
             echo "\`outputs/CI_SUMMARY.txt\`" >> $GITHUB_STEP_SUMMARY
             cat outputs/CI_SUMMARY.txt >> $GITHUB_STEP_SUMMARY
           fi
-            outputs/CI_SUMMARY.txt
