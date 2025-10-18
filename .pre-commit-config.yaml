@@ -16,3 +16,10 @@ repos:
     hooks:
       - id: detect-secrets
         args: [ "--baseline", ".secrets.baseline" ]
+  - repo: local
+    hooks:
+      - id: utf8-guard
+        name: Ensure UTF-8 in build-critical files
+        entry: python scripts/utf8_guard.py
+        language: system
+        files: ^(pyproject\.toml|setup\.cfg|MANIFEST\.in|README(\.md|\.rst)?|requirements.*\.txt|MODEL_CARD\.md|CHANGELOG\.md)$

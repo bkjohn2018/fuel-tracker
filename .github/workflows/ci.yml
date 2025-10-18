@@ -1,4 +1,4 @@
-﻿name: ci
+name: ci
 on:
   push:
     branches: [ "main" ]
@@ -18,6 +18,27 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v4
+
+      - name: UTF-8 sanity for build-critical files
+        run: |
+          python - <<'PY'
+import pathlib, sys
+targets = [
+    "pyproject.toml","setup.cfg","MANIFEST.in",
+    "README.md","README.rst","requirements.txt",
+    "requirements-dev.txt","MODEL_CARD.md","CHANGELOG.md"
+]
+errs=[]
+for t in targets:
+    p=pathlib.Path(t)
+    if p.exists():
+        try:
+            p.read_text(encoding="utf-8")
+        except Exception as e:
+            errs.append(f"{t}: {e}")
+if errs:
+    print("\n".join(errs)); sys.exit(1)
+PY
 
       - uses: actions/setup-python@v5
         with:

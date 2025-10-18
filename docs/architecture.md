@@ -76,6 +76,16 @@ flowchart LR
     "freq": "monthly",
     "lineage": BatchMeta      # batch_id, asof_ts, source, notes
 }
+```mermaid
+flowchart TD
+  A[Fuel Variance > 2%] --> B[True-up Analysis]
+  B --> C{Under vs Over Recovery?}
+  C -->|Under| D[Recognize Regulatory Asset (182.3)]
+  C -->|Over| E[Recognize Regulatory Liability (254)]
+  D --> F[Disclosure: Probable Recovery per ASC 980-340]
+  E --> G[Disclosure: Probable Refund per ASC 980-405]
+  F --> H[Regulatory Reporting (Form 2 / 3-Q)]
+  G --> H
 ```
 
 ### Batch Metadata (BatchMeta)
@@ -125,7 +135,7 @@ flowchart LR
 - Complete audit trail for financial reporting
 
 ### Data Quality Controls
-- ±2% tolerance validation vs source data
+- Â±2% tolerance validation vs source data
 - Provisional mode blocking during data staleness
 - Automated exception flagging for out-of-tolerance data
 
