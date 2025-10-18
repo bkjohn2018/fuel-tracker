@@ -1,6 +1,6 @@
 ---
 name: Release Checklist
-about: Pre-release verification for Fuel Tracker
+about: Pre-release verification for FIRE (Fuel Integrity & Reconciliation Engine)
 title: "Release {{VERSION}} – Checklist"
 labels: release
 ---

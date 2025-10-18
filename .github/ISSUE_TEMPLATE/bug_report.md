@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve Fuel Tracker
+about: Create a report to help us improve FIRE (Fuel Integrity & Reconciliation Engine)
 title: '[BUG] '
 labels: bug
 assignees: ''
@@ -26,7 +26,7 @@ Paste any error messages or logs here
 **Environment**
 - OS: [e.g. Windows 10, macOS 12.0, Ubuntu 20.04]
 - Python version: [e.g. 3.11.0]
-- Fuel Tracker version: [e.g. 0.1.0]
+- FIRE version: [e.g. 0.1.0]
 
 **Additional Context**
 Add any other context about the problem here.

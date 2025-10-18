@@ -1,4 +1,4 @@
-# Fuel Tracker Makefile
+# FIRE Makefile
 # Quick run order for common operations
 
 .PHONY: help setup pull backtest forecast clean lint test build status
@@ -8,7 +8,7 @@ SHELL := bash
 
 # Default target
 help:
-	@echo "Fuel Tracker - Quick Run Commands"
+	@echo "FIRE - Quick Run Commands"
 	@echo ""
 	@echo "Commands:"
 	@echo "  setup     - Install dependencies and setup environment"
@@ -28,7 +28,7 @@ help:
 
 # Install dependencies and setup environment
 setup:
-	@echo "Setting up Fuel Tracker environment..."
+	@echo "Setting up FIRE environment..."
 	pip install -r requirements.txt
 	@echo "Setup complete!"
 
@@ -91,7 +91,7 @@ clean:
 
 # Show current status
 status:
-	@echo "Fuel Tracker Status:"
+	@echo "FIRE Status:"
 	@echo ""
 	@echo "Files:"
 	@ls -la outputs/ 2>/dev/null || echo "  No outputs directory"

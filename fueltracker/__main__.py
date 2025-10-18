@@ -9,9 +9,9 @@ from . import __version__
 def main() -> None:
     """Display a simple banner with version information."""
     lines = [
-        "Fuel Tracker",
+        "[FIRE] Fuel Integrity & Reconciliation Engine",
         f"Version: {__version__}",
-        "A compliance-focused pipeline for fuel forecasting.",
+        "Formerly: ‘Fuel Tracker’ (no functional changes in this release)",
     ]
     print("\n".join(lines))
 

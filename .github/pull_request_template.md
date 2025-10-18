@@ -1,4 +1,4 @@
-## Fuel Tracker — PR Review Checklist
+## FIRE — PR Review Checklist (Fuel Integrity & Reconciliation Engine)
 
 ### Compliance & Accounting
 - [ ] README and MODEL_CARD reference FERC 820, 489, 182.3, 254 correctly
@@ -30,3 +30,9 @@
 - [ ] Tests pass and coverage maintained
 - [ ] No hardcoded secrets or credentials
 - [ ] Documentation updated for any API changes
+
+### Rebrand (text-only)
+- [ ] “FIRE” used on first mention with expansion
+- [ ] No code identifiers, imports, or schemas modified
+- [ ] README/Model Card updated
+- [ ] Startup log banner updated

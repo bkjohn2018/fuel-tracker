@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Product name rebranded from “Fuel Tracker” to FIRE (Fuel Integrity & Reconciliation Engine).
+- Documentation, CLI help text, and log banners updated. No functional/architectural changes.
 
 ## [v0.1.0] - 2025-09-21
 ### Added

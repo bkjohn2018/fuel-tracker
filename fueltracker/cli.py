@@ -164,7 +164,13 @@ def run_forecast(mode: str, model: str = "baseline", horizon: int = 12) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(prog="fueltracker")
+    parser = argparse.ArgumentParser(
+        prog="fueltracker",
+        description=(
+            "FIRE (Fuel Integrity & Reconciliation Engine) — compressor-fuel "
+            "reconciliation & lineage. (formerly 'Fuel Tracker')."
+        ),
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
     # pull
     s_pull = sub.add_parser("pull")

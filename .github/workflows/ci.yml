@@ -130,7 +130,7 @@ jobs:
         if: always()
         run: |
           mkdir -p outputs
-          echo "----- FUEL TRACKER CI SUMMARY -----" > outputs/CI_SUMMARY.txt
+          echo "----- FIRE CI SUMMARY -----" > outputs/CI_SUMMARY.txt
           date -u +"asof: %Y-%m-%dT%H:%M:%SZ" >> outputs/CI_SUMMARY.txt
           echo "" >> outputs/CI_SUMMARY.txt
           if [ -f outputs/status.json ]; then
@@ -197,7 +197,7 @@ jobs:
       - name: Step summary
         if: always()
         run: |
-          echo "## Fuel Tracker CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## FIRE CI Summary" >> $GITHUB_STEP_SUMMARY
           if [ -f outputs/status.json ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "\`outputs/status.json\`" >> $GITHUB_STEP_SUMMARY
