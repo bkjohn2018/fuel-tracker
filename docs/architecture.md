@@ -15,7 +15,7 @@ flowchart LR
     E --> G[metrics.csv<br/>stability log]
     F --> H[forecast_12m.csv]
     D --> I[panel_monthly.parquet]
-    C --> J[Compliance Checks<br/>±2% tolerance, provisional mode]
+    C --> J[Compliance Checks<br/>Â±2% tolerance, provisional mode]
     J --> K[Publish Decision]
     K --> L[Lineage Log<br/>JSONL audit trail]
 ```
@@ -33,7 +33,7 @@ flowchart LR
 - **Lineage Tracking** (`lineage.py`): UUID-based batch tracking with timestamps
 
 ### 3. Modeling Layer
-- **Baseline Model** (`models/baseline.py`): Seasonal-Naïve forecasting
+- **Baseline Model** (`models/baseline.py`): Seasonal-NaÃ¯ve forecasting
 - **STL+ETS Model** (`models/stl_ets.py`): Seasonal-Trend decomposition
 - **SARIMAX Model** (`models/sarimax.py`): ARIMA with exogenous variables
 
@@ -44,14 +44,14 @@ flowchart LR
 
 ### 5. Compliance & Controls
 - **Provisional Mode** (`provisional.py`): Blocks publishing when cache stale
-- **Tolerance Validation**: ±2% variance checking vs source
+- **Tolerance Validation**: Â±2% variance checking vs source
 - **Audit Trail**: Complete lineage logging in JSONL format
 
 ## Data Flow
 
 ### Monthly Pipeline Execution
-1. **Data Fetch**: EIA API → Cache validation → Raw data retrieval
-2. **Schema Mapping**: Raw data → MonthlyFuelRow schema with lineage
+1. **Data Fetch**: EIA API â†’ Cache validation â†’ Raw data retrieval
+2. **Schema Mapping**: Raw data â†’ MonthlyFuelRow schema with lineage
 3. **Panel Building**: Standardized monthly panel with batch metadata
 4. **Compliance Check**: Tolerance validation and provisional mode check
 5. **Backtesting**: Rolling-origin validation on frozen data vintage
@@ -62,7 +62,7 @@ flowchart LR
 ### Revision Management
 - **Append-Only**: New data creates new batch, never overwrites
 - **Frozen Panels**: Backtests use data vintage at specific timestamp
-- **State Idempotence**: Same source → same outputs; new source → new batch
+- **State Idempotence**: Same source â†’ same outputs; new source â†’ new batch
 - **Rollback Capability**: Previous forecasts preserved in lineage
 
 ## Data Contracts
@@ -125,7 +125,7 @@ flowchart LR
 - Complete audit trail for financial reporting
 
 ### Data Quality Controls
-- ±2% tolerance validation vs source data
+- Â±2% tolerance validation vs source data
 - Provisional mode blocking during data staleness
 - Automated exception flagging for out-of-tolerance data
 
