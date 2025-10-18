@@ -26,22 +26,22 @@ jobs:
       - name: UTF-8 sanity for build-critical files
         run: |
           python - <<'PY'
-import pathlib, sys
-targets = [
-    "pyproject.toml","setup.cfg","MANIFEST.in",
-    "README.md","README.rst","requirements.txt",
-    "requirements-dev.txt","MODEL_CARD.md","CHANGELOG.md"
-]
-errs=[]
-for t in targets:
-    p=pathlib.Path(t)
-    if p.exists():
-        try:
-            p.read_text(encoding="utf-8")
-        except Exception as e:
-            errs.append(f"{t}: {e}")
-if errs:
-    print("\n".join(errs)); sys.exit(1)
+          import pathlib, sys
+          targets = [
+              "pyproject.toml","setup.cfg","MANIFEST.in",
+              "README.md","README.rst","requirements.txt",
+              "requirements-dev.txt","MODEL_CARD.md","CHANGELOG.md"
+          ]
+          errs=[]
+          for t in targets:
+              p = pathlib.Path(t)
+              if p.exists():
+                  try:
+                      p.read_text(encoding="utf-8")
+                  except Exception as e:
+                      errs.append(f"{t}: {e}")
+          if errs:
+              print("\n".join(errs)); sys.exit(1)
 PY
 
       - name: Cache pip
@@ -190,22 +190,22 @@ PY
       - name: UTF-8 sanity for build-critical files
         run: |
           python - <<'PY'
-import pathlib, sys
-targets = [
-    "pyproject.toml","setup.cfg","MANIFEST.in",
-    "README.md","README.rst","requirements.txt",
-    "requirements-dev.txt","MODEL_CARD.md","CHANGELOG.md"
-]
-errs=[]
-for t in targets:
-    p=pathlib.Path(t)
-    if p.exists():
-        try:
-            p.read_text(encoding="utf-8")
-        except Exception as e:
-            errs.append(f"{t}: {e}")
-if errs:
-    print("\n".join(errs)); sys.exit(1)
+          import pathlib, sys
+          targets = [
+              "pyproject.toml","setup.cfg","MANIFEST.in",
+              "README.md","README.rst","requirements.txt",
+              "requirements-dev.txt","MODEL_CARD.md","CHANGELOG.md"
+          ]
+          errs=[]
+          for t in targets:
+              p = pathlib.Path(t)
+              if p.exists():
+                  try:
+                      p.read_text(encoding="utf-8")
+                  except Exception as e:
+                      errs.append(f"{t}: {e}")
+          if errs:
+              print("\n".join(errs)); sys.exit(1)
 PY
       - run: pip install -r requirements.txt && pip install -e .
       - name: Pull/backtest/forecast (publish)
