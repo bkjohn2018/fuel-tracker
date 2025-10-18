@@ -3,6 +3,11 @@
 ## Overview
 The FIRE system is designed as a compliance-focused, revision-aware data pipeline for forecasting US pipeline compressor fuel consumption. The architecture emphasizes auditability, reproducibility, and regulatory compliance for FERC Account 820 reporting.
 
+### Diagrams
+- [System Architecture](#system-architecture)
+- [Compliance Flow (ASC 980)](#compliance-flow-asc-980)
+- [Data Contracts](#data-contracts)
+
 ## System Architecture
 
 ```mermaid
@@ -76,17 +81,6 @@ flowchart LR
     "freq": "monthly",
     "lineage": BatchMeta      # batch_id, asof_ts, source, notes
 }
-```mermaid
-```mermaid
-flowchart TD
-  A[Fuel Variance > 2%] --> B[True-up Analysis]
-  B --> C{Under vs Over Recovery?}
-  C -->|Under| D[Recognize Regulatory Asset 182_3]
-  C -->|Over| E[Recognize Regulatory Liability 254]
-  D --> F[Disclosure: Probable Recovery per ASC 980-340]
-  E --> G[Disclosure: Probable Refund per ASC 980-405]
-  F --> H[Regulatory Reporting: Form 2 and 3-Q]
-  G --> H
 ```
 
 ### Batch Metadata (BatchMeta)
@@ -258,7 +252,7 @@ flowchart TD
 
 ### FERC Compliance
 - **Account 820**: Pipeline compressor fuel expense reporting
-- **Form 2/3-Q**: Quarterly regulatory reporting support
+- **Form 2 and 3-Q**: Quarterly regulatory reporting support
 - **Rate Case Support**: Historical data for rate case filings
 - **Audit Trail**: Complete lineage for regulatory review
 
