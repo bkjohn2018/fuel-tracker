@@ -158,16 +158,17 @@ flowchart TD
   A[Fuel Variance > 2%] --> B[True-up Analysis]
   B --> C{Under vs Over Recovery?}
   C -->|Under| D[Recognize Regulatory Asset (182.3)]
-  C -->|Over| E[Recognize Regulatory Liability (254)]
+  C -->|Over|  E[Recognize Regulatory Liability (254)]
   D --> F[Disclosure: Probable Recovery per ASC 980-340]
   E --> G[Disclosure: Probable Refund per ASC 980-405]
-  F & G --> H[Regulatory Reporting (Form 2 / 3-Q)]
+  F --> H[Regulatory Reporting (Form 2 / 3-Q)]
+  G --> H
 ```
 
 * **Controls:**
   * Variance detection triggers provisional mode until resolved.
   * Management reassesses ASC 980 scope criteria annually.
-  * Cross-team sign-off (Measurement → Scheduling → Accounting → Regulatory) ensures GAAP/FERC tie-out.
+  * Cross-team sign-off (Measurement + Scheduling + Accounting + Regulatory) ensures GAAP/FERC tie-out.
 
 ## Monitoring & Operations
 
