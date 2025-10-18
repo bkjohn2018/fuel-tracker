@@ -1,4 +1,4 @@
-# Fuel Tracker
+﻿# Fuel Tracker
 
 **A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
 
@@ -26,25 +26,25 @@
 
 ## Features
 
-### ðŸ”„ Revision-Aware Lineage
+### Revision-Aware Lineage
 - **Batch Tracking**: Every data update creates new `batch_id` with UTC timestamp
 - **Append-Only**: New revisions as PTAs (Point-in-Time Archives); never overwrites
 - **Frozen Backtests**: Each data vintage preserved for reproducible validation
-- **State Idempotence**: Same source snapshot â†’ same outputs; new snapshot â†’ new batch
+- **State Idempotence**: Same source snapshot -> same outputs; new snapshot -> new batch
 
-### ðŸ›¡ï¸ Data Integrity & Controls
-- **Â±2% Tolerance**: Automated validation vs EIA source snapshots
+### Data Integrity & Controls
+- **+/-2% Tolerance**: Automated validation vs EIA source snapshots
 - **Provisional Mode**: Blocks publishing when upstream stale >3 business days
 - **Exception Flagging**: Out-of-tolerance data automatically flagged for review
 - **Cache Management**: 3-day business day TTL with staleness detection
 
-### ðŸ“Š Modeling Portfolio
-- **Seasonal-NaÃ¯ve**: Baseline model for performance benchmarking
+### Modeling Portfolio
+- **Seasonal-Naive**: Baseline model for performance benchmarking
 - **STL+ETS**: Seasonal-Trend decomposition with Exponential Smoothing
 - **SARIMAX**: ARIMA with exogenous variables (HDD/CDD, Henry Hub)
 - **Rolling Backtest**: 60-month lookback, 12-month horizon validation
 
-### ðŸ“ˆ Compliance & Auditability
+### Compliance & Auditability
 - **FERC Alignment**: Designed for Account 820 reporting requirements
 - **ASC 980 Compliance**: Probable recovery assessment for fuel surcharge recognition
 - **Cross-Account Support**: Integration with Accounts 182.3/254 for under/over-recovery
@@ -72,7 +72,7 @@ Fuel Tracker explicitly supports recognition of regulatory assets and liabilitie
   - Liabilities are reversed when refunded or offset in future rate periods.
 
 - **Fuel Cost Tracker Mechanism:**
-  - Fuel Tracker's variance logging (Â±2% tolerance) is designed to support fuel cost trackers/true-ups, a common regulatory mechanism explicitly contemplated by ASC 980.
+  - Fuel Tracker's variance logging (+/- 2% tolerance) is designed to support fuel cost trackers/true-ups, a common regulatory mechanism explicitly contemplated by ASC 980.
 
 ## Quickstart
 
@@ -143,12 +143,12 @@ python -m fueltracker.forecast --model baseline --horizon 12
 - **No Overwrites**: Previous data vintages preserved for auditability
 - **Batch Tracking**: Each update creates new batch with UUID and timestamp
 - **Frozen Panels**: Backtests use data vintage at specific timestamp
-- **State Idempotence**: Same source â†’ same outputs; new source â†’ new batch
+- **State Idempotence**: Same source -> same outputs; new source -> new batch
 
 ## Modeling & Backtesting
 
 ### Model Portfolio
-1. **Seasonal-NaÃ¯ve**: Simple seasonal pattern replication (baseline)
+1. **Seasonal-Naive**: Simple seasonal pattern replication (baseline)
 2. **STL+ETS**: Seasonal-Trend decomposition with Exponential Smoothing
 3. **SARIMAX**: ARIMA with exogenous variables (HDD/CDD, Henry Hub)
 
@@ -161,18 +161,18 @@ python -m fueltracker.forecast --model baseline --horizon 12
 - **Method**: Rolling-origin with frozen panels per data vintage
 - **Window**: 60 months lookback, 12 months horizon
 - **Metrics**: MAE, sMAPE, RMSE, MAPE
-- **Success Criteria**: Beat Seasonal-NaÃ¯ve by â‰¥10% median MAE/sMAPE
-- **Stability Tracking**: Alert when top model flips â‰¥N times across M revisions
+- **Success Criteria**: Beat Seasonal-Naive by >=10% median MAE/sMAPE
+- **Stability Tracking**: Alert when top model flips >=N times across M revisions
 
 ## Compliance & Controls
 
 ### Tolerance Rules
-- **Source Validation**: Â±2% variance vs EIA source snapshot
+- **Source Validation**: +/-2% variance vs EIA source snapshot
 - **Exception Handling**: Out-of-tolerance data flagged for review
 - **Provisional Mode**: Blocks publishing when cache stale >3 business days
 
 ### Tie-out Process
-- **Monthly**: Variance analysis with Â±2% tolerance
+- **Monthly**: Variance analysis with +/-2% tolerance
 - **Quarterly**: Form 2/3-Q bridge with escalation paths
 - **Annual**: Full compliance audit and system review
 - **CPA Review**: External audit documentation and certification
@@ -185,20 +185,20 @@ python -m fueltracker.forecast --model baseline --horizon 12
 
 - **Record fuel retainage revenue (Acct 489)**
   - Dr 142/AR (or clearing)
-  - Cr 489 Transportation revenue â€“ fuel retainage
+  - Cr 489 Transportation revenue - fuel retainage
 
 - **Under-recovery (regulatory asset, Acct 182.3)**
-  - Dr 182.3 Regulatory asset â€“ fuel under-recovery
-  - Cr 489 Transportation revenue â€“ fuel retainage (or 254 reversal on settlement)
+  - Dr 182.3 Regulatory asset - fuel under-recovery
+  - Cr 489 Transportation revenue - fuel retainage (or 254 reversal on settlement)
 
 - **Over-recovery (regulatory liability, Acct 254)**
-  - Dr 489 Transportation revenue â€“ fuel retainage (or 182.3 reversal on settlement)
-  - Cr 254 Regulatory liability â€“ fuel over-recovery
+  - Dr 489 Transportation revenue - fuel retainage (or 182.3 reversal on settlement)
+  - Cr 254 Regulatory liability - fuel over-recovery
 
 > **Variance & Escalation**
-> - If |Actual âˆ’ Source| / Source > **2%** at monthly tie-out:
+> - If |Actual - Source| / Source > **2%** at monthly tie-out:
 >   1) Re-pull snapshot & rerun panel for same `asof_ts`
->   2) If variance persists â†’ open "Fuel Variance" ticket with artifacts:
+>   2) If variance persists -> open "Fuel Variance" ticket with artifacts:
 >      - Source snapshot metadata, `batch_id`, `asof_ts`
 >      - Diff excerpt (by month) and top drivers
 >   3) Mark run **provisional** and **do not publish** until resolved
@@ -220,7 +220,7 @@ flowchart LR
     E --> G[metrics.csv<br/>stability log]
     F --> H[forecast_12m.csv]
     D --> I[panel_monthly.parquet]
-    C --> J[Compliance Checks<br/>Â±2% tolerance, provisional mode]
+    C --> J[Compliance Checks<br/>+/- 2% tolerance, provisional mode]
 ```
 
 *See [docs/architecture.md](docs/architecture.md) for detailed system design.*
