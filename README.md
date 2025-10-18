@@ -1,4 +1,4 @@
-# FIRE ó Fuel Integrity & Reconciliation Engine
+# FIRE ‚Äî Fuel Integrity & Reconciliation Engine
 
 **A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
 
@@ -332,4 +332,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-Formerly: ìFuel Trackerî (no functional changes in this release)
+Formerly: ‚ÄúFuel Tracker‚Äù (no functional changes in this release)
