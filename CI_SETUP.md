@@ -1,4 +1,4 @@
-# Fuel Tracker CI/CD Setup Guide
+# FIRE CI/CD Setup Guide
 
 ## 🚀 Quick Start
 

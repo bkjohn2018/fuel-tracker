@@ -1,10 +1,10 @@
-# Fuel Tracker Model Card
+# MODEL CARD — FIRE (Fuel Integrity & Reconciliation Engine)
 
 ## Model Information
 - **Model Name**: Pipeline Compressor Fuel Consumption Forecasting
 - **Version**: 0.1.0
-- **Last Updated**: [Auto-updated]
-- **Batch ID**: [Auto-updated]
+- **Last Updated**: 2025-10-17 22:50:00 UTC
+- **Batch ID**: ddcaa3e1-7e5c-4b9c-85ce-12f6bbaa33ea
 
 ## Objective
 Forecast monthly US pipeline compressor fuel consumption in million cubic feet (MMcf) to support operational planning, resource allocation, and regulatory compliance for FERC Account 820 reporting.
@@ -66,24 +66,31 @@ Forecast monthly US pipeline compressor fuel consumption in million cubic feet (
 - **Rollback Capability**: Previous forecasts preserved in lineage log
 
 ## Forecast Details
+## Latest Forecast Statistics
+- **Model Used**: baseline
+- **Forecast Horizon**: 12 months
+- **Forecast Mean**: 77.04 MMcf
+- **PI Half-Width**: 9.32 MMcf
+- **Generated**: 2025-10-17 22:50:00 UTC
+
 - **Horizon**: 12 months
 - **Frequency**: Monthly (month-end dates)
 - **Prediction Intervals**: Naive bands using historical MAE
-- **Last Forecast**: [Auto-updated]
+- **Last Forecast**: 2025-10-17 22:50:00 UTC
 - **Confidence Level**: 95% (configurable)
 
 ## Compliance & Controls
 ### Lineage Philosophy: PTA vs. PPA
 
 In accounting, Prior Period Adjustments (PPAs) are formal restatements of prior financial results to reflect new or corrected information under GAAP/FERC guidance.
-In Fuel Tracker, the analogous concept for forecasting and reconciliation is the Point-in-Time Archive (PTA) — a complete analytical snapshot that captures all data and model context as they existed at a specific time.
+In FIRE, the analogous concept for forecasting and reconciliation is the Point-in-Time Archive (PTA) - a complete analytical snapshot that captures all data and model context as they existed at a specific time.
 
 - PPA (Accounting) → Ensures financial transparency and compliance for restatements.
 - PTA (Analytics) → Ensures analytical reproducibility and lineage integrity across forecast vintages.
 
 Each PTA carries a unique `batch_id` and `asof_ts`, forming a verifiable lineage chain that allows the system to reproduce any historical forecast or reconciliation exactly as it was run.
 
-This deliberate terminology avoids confusion for accounting and audit audiences, reinforcing that Fuel Tracker’s revision logic is analytical, not financial — designed to preserve the integrity of forecasts, not to restate results.
+This deliberate terminology avoids confusion for accounting and audit audiences, reinforcing that FIRE's revision logic is analytical, not financial - designed to preserve the integrity of forecasts, not to restate results.
 - **FERC Alignment**: Designed for Account 820 reporting requirements
 - **ASC 980 Compliance**: Probable recovery assessment for fuel surcharge recognition
 - **GAAP Compliance**: Audit trail supports financial reporting
@@ -161,7 +168,7 @@ This deliberate terminology avoids confusion for accounting and audit audiences,
 - [ ] Regulatory reporting data validated
 
 ## Contact & Support
-- **Team**: Fuel Tracker Team
+- **Team**: FIRE Team
 - **Repository**: [GitHub Repository URL]
 - **Issues**: [GitHub Issues URL]
 - **Documentation**: [Documentation URL]

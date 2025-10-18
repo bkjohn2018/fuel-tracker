@@ -1,4 +1,4 @@
-# Fuel Tracker – Release {{VERSION}} ({{DATE}})
+# FIRE — Fuel Integrity & Reconciliation Engine — Release {{VERSION}} ({{DATE}})
 
 ## Summary
 Production-lean, compliance-ready release focused on documentation, governance scaffolding, and audit traceability. No runtime behavior changes.

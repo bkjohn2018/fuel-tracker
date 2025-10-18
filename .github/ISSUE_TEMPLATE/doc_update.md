@@ -1,6 +1,6 @@
 ---
 name: Documentation Update
-about: Request updates to Fuel Tracker documentation
+about: Request updates to FIRE (Fuel Integrity & Reconciliation Engine) documentation
 title: '[DOCS] '
 labels: documentation
 assignees: ''

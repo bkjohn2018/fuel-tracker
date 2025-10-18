@@ -1,4 +1,4 @@
-ï»¿# Fuel Tracker
+# FIRE — Fuel Integrity & Reconciliation Engine
 
 **A compliance-focused, revision-aware pipeline for forecasting US pipeline compressor fuel consumption (FERC Account 820)**
 
@@ -55,7 +55,7 @@
 
 ### ASC 980 Compliance
 
-Fuel Tracker explicitly supports recognition of regulatory assets and liabilities in accordance with ASC 980, *Regulated Operations*. The system is designed to mirror the requirements of cost-of-service regulation:
+FIRE explicitly supports recognition of regulatory assets and liabilities in accordance with ASC 980, *Regulated Operations*. The system is designed to mirror the requirements of cost-of-service regulation:
 
 - **Scope Criteria (ASC 980-10-15):**
   - Rates are set or approved by an authorized regulator or governing board.
@@ -72,7 +72,7 @@ Fuel Tracker explicitly supports recognition of regulatory assets and liabilitie
   - Liabilities are reversed when refunded or offset in future rate periods.
 
 - **Fuel Cost Tracker Mechanism:**
-  - Fuel Tracker's variance logging (+/- 2% tolerance) is designed to support fuel cost trackers/true-ups, a common regulatory mechanism explicitly contemplated by ASC 980.
+  - FIRE's variance logging (+/- 2% tolerance) is designed to support fuel cost trackers/true-ups, a common regulatory mechanism explicitly contemplated by ASC 980.
 
 ## Quickstart
 
@@ -326,3 +326,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 **Questions?** Check the [Model Card](MODEL_CARD.md) for detailed assumptions and limitations, or review the [Architecture Guide](docs/architecture.md) for system design details.
+
+## Vision
+- See docs/vision/FIRE-ecosystem-brief.md for the one-pager covering FIRE, the CompressionSight analytics lens, and The Compliance Curve governance frame.
+
+---
+
+Formerly: “Fuel Tracker” (no functional changes in this release)

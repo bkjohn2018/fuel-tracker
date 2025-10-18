@@ -1,7 +1,7 @@
-# Fuel Tracker Architecture
+# FIRE (Fuel Integrity & Reconciliation Engine) Architecture
 
 ## Overview
-The Fuel Tracker system is designed as a compliance-focused, revision-aware data pipeline for forecasting US pipeline compressor fuel consumption. The architecture emphasizes auditability, reproducibility, and regulatory compliance for FERC Account 820 reporting.
+The FIRE system is designed as a compliance-focused, revision-aware data pipeline for forecasting US pipeline compressor fuel consumption. The architecture emphasizes auditability, reproducibility, and regulatory compliance for FERC Account 820 reporting.
 
 ## System Architecture
 

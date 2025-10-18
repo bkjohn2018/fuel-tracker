@@ -1,4 +1,4 @@
-# Fuel Tracker — Security Hardening Path (Phase 2+)
+# FIRE — Security Hardening Path (Phase 2+)
 
 **Current (Phase 1):**
 - Repo-level secret `EIA_API_KEY`
