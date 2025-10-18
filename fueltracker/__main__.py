@@ -11,7 +11,7 @@ def main() -> None:
     lines = [
         "[FIRE] Fuel Integrity & Reconciliation Engine",
         f"Version: {__version__}",
-        "Formerly: ‘Fuel Tracker’ (no functional changes in this release)",
+        "Formerly: ""Fuel Tracker"" (no functional changes in this release)",
     ]
     print("\n".join(lines))
 
