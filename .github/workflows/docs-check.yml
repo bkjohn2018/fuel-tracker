@@ -6,8 +6,6 @@ on:
       - 'docs/**'
       - 'scripts/check_ascii.py'
       - '.gitattributes'
-      - '.github/workflows/docs-check.yml'
-      - '.github/puppeteer-config.json'
 
 jobs:
   ascii_lint:
@@ -19,15 +17,3 @@ jobs:
           python-version: '3.11'
       - name: ASCII/UTF-8/LF check
         run: python scripts/check_ascii.py
-
-  mermaid_build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Install mermaid-cli
-        run: npm i -D @mermaid-js/mermaid-cli@10.9.1
-      - name: Generate Mermaid diagram
-        run: npx mmdc -i docs/assets/diagrams/qptm_agv_lineage.mmd -o docs/assets/qptm_agv_lineage.png -b transparent -w 1600
