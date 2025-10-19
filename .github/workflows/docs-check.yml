@@ -30,4 +30,4 @@ jobs:
       - name: Install mermaid-cli
         run: npm i -D @mermaid-js/mermaid-cli@10.9.1
       - name: Generate Mermaid diagram
-        run: npx mmdc -i docs/assets/diagrams/qptm_agv_lineage.mmd -o docs/assets/qptm_agv_lineage.png -b transparent -w 1600 --puppeteerConfigFile .github/puppeteer-config.json
+        run: npx mmdc -i docs/assets/diagrams/qptm_agv_lineage.mmd -o docs/assets/qptm_agv_lineage.png -b transparent -w 1600 --no-sandbox
