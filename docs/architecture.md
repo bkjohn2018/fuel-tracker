@@ -8,6 +8,10 @@ The FIRE system is designed as a compliance-focused, revision-aware data pipelin
 - [Compliance Flow (ASC 980)](#compliance-flow-asc-980)
 - [Data Contracts](#data-contracts)
 
+## Related Documents
+
+- QPTM Allocation Governance & Validation (AGV): see /docs/qptm_agv_validation.md
+
 ## System Architecture
 
 ```mermaid

@@ -329,6 +329,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Vision
 - See docs/vision/FIRE-ecosystem-brief.md for the one-pager covering FIRE, the CompressionSight analytics lens, and The Compliance Curve governance frame.
+- Review docs/qptm_agv_validation.md for the QPTM Allocation Governance & Validation (AGV) read-only ML validator.
 
 ---
 
