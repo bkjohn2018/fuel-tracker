@@ -8,6 +8,38 @@ The FIRE system is designed as a compliance-focused, revision-aware data pipelin
 - [Compliance Flow (ASC 980)](#compliance-flow-asc-980)
 - [Data Contracts](#data-contracts)
 
+## Related Documents
+
+- QPTM Allocation Governance & Validation (AGV): see /docs/qptm_agv_validation.md
+
+### QPTM AGV Lineage Overview
+
+```mermaid
+flowchart LR
+    A[FlowCal<br/>Measurement Data] --> B[QPTM<br/>Allocation Engine]
+    B --> C[Accounting / GL<br/>Fuel & Revenue Entries]
+    C --> D[FERC / SOC1<br/>Reports]
+
+    subgraph BBZ[Black Box Zone]
+        B
+    end
+
+    subgraph AGV[AGV ML Validation Layer]
+        E1[Read-only Input/Output Data]
+        E2["Ensemble Model<br/>(GBM + RF + LogReg)"]
+        E3["Exception Register<br/>+ Audit Artifacts"]
+        E1 --> E2 --> E3
+    end
+
+    A -.-> AGV
+    B -.-> AGV
+    C -.-> AGV
+
+    style BBZ fill:#fff0f0,stroke:#ff0000,stroke-width:1px
+    style AGV fill:#f0f9ff,stroke:#007acc,stroke-width:1px
+    classDef default fill:#ffffff,stroke:#333,stroke-width:0.8px;
+```
+
 ## System Architecture
 
 ```mermaid

@@ -1,7 +1,7 @@
 # FIRE Makefile
 # Quick run order for common operations
 
-.PHONY: help setup pull backtest forecast clean lint test build status
+.PHONY: help setup pull backtest forecast clean lint test build status docs
 
 SHELL := bash
 .SHELLFLAGS := -euo pipefail -c
@@ -104,3 +104,9 @@ status:
 	@echo ""
 	@echo "Forecast:"
 	@wc -l outputs/forecast_12m.csv 2>/dev/null || echo "  No forecast file"
+
+.PHONY: docs
+
+docs:
+	@echo "Validating documentation encoding and line endings..."
+	python3 scripts/check_ascii.py

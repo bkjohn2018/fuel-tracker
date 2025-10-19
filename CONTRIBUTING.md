@@ -4,7 +4,9 @@ We use **Conventional Commits** and maintain a **Keep a Changelog**.
 - feat:, fix:, docs:, chore:, ci:, refactor:, test:, perf:, build:
 
 ## Local Dev
-- Python version: match repo config / CI
+- Python version: 3.11+ (matches CI)
+- Node.js 18+ (required for Mermaid CLI docs renders)
+- Optional: GNU Make (for `make docs`; otherwise call `python scripts/check_ascii.py`)
 - Install: `poetry install` or `pip install -e .`
 - Lint: `make lint`
 - Test: `make test`
