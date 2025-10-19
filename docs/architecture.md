@@ -105,25 +105,22 @@ flowchart LR
 ## Data Contracts
 
 ### Panel Schema (MonthlyFuelRow)
-```python
-{
-    "period": date,           # Month-end date
-    "value_mmcf": float,      # Fuel consumption in MMcf
-    "metric": "pipeline_compressor_fuel",
-    "freq": "monthly",
-    "lineage": BatchMeta      # batch_id, asof_ts, source, notes
-}
-```
+| **Field**      | **Type**    | **Description**                                             |
+| -------------- | ----------- | ----------------------------------------------------------- |
+| **period**     | `date`      | Month-end date                                              |
+| **value_mmcf** | `float`     | Fuel consumption in million cubic feet (MMcf)               |
+| **metric**     | `str`       | Metric identifier - always `"pipeline_compressor_fuel"`      |
+| **freq**       | `str`       | Frequency of observation (`monthly`)                        |
+| **lineage**    | `BatchMeta` | Lineage metadata (`batch_id`, `asof_ts`, `source`, `notes`) |
+
 
 ### Batch Metadata (BatchMeta)
-```python
-{
-    "batch_id": UUID,         # Unique batch identifier
-    "asof_ts": datetime,      # UTC timestamp
-    "source": "EIA|BACKTEST|FORECAST",
-    "notes": str              # Optional batch description
-}
-```
+| **Field**    | **Type**   | **Description**                                   |
+| ------------ | ---------- | ------------------------------------------------- |
+| **batch_id** | `UUID`     | Unique batch identifier                           |
+| **asof_ts**  | `datetime` | UTC timestamp of data snapshot                    |
+| **source**   | `str`      | Origin of data - `EIA`, `BACKTEST`, or `FORECAST` |
+| **notes**    | `str`      | Optional batch description or contextual note     |
 
 ## Configuration Management
 
