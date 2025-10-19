@@ -36,7 +36,7 @@ flowchart LR
 
     subgraph AGV[AGV ML Validation Layer]
         E1[Read-only Input/Output Data]
-        E2[Ensemble Model<br/>(GBM + RF + LogReg)]
+        E2["Ensemble Model<br/>(GBM + RF + LogReg)"]
         E3[Exception Register<br/>+ Audit Artifacts]
         E1 --> E2 --> E3
     end
