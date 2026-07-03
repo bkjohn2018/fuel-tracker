@@ -23,4 +23,7 @@ FIRE (Fuel Integrity & Reconciliation Engine) automates compressor fuel accounti
 - Escalation: Provisional runs blocked; >2% variance triggers review and traceable ticket.
 - Governance visibility: Provided by AGV read-only ML validator (see docs/qptm_agv_validation.md).
 
+## Training Materials
+FIRE handles the technical estimate and reconciliation layer for compressor fuel. The Fuel Retainage bundle covers the people, process, and accounting layer -- onboarding, month-end reference, and the full regulatory loop including ASC 980 entries and 18 CFR 154.403 rate actions. See [docs/retainage/README.md](../retainage/README.md).
+
 Formerly: "Fuel Tracker" (no functional changes)
